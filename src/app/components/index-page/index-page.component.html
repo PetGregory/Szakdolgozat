@@ -1,0 +1,45 @@
+<section class=" flex flex-col items-start min-h-screen">
+  <div
+    class="max-w-6xl text-left mt-40 mb-12 ml-12 max-[640px]:mb-3 max-[1000px]:mt-3"
+  >
+    <h1
+      class="text-3xl md:text-5xl font-extrabold mb-4"
+      [class.text-black]="!darkModeService.darkMode()"
+      [class.text-primary]="darkModeService.darkMode()"
+    >
+      Smarter workouts. Real progress. Your pace. Real results — built smart.
+    </h1>
+    <p
+      class="max-w-5xl text-lg md:text-xl text-gray mb-6"
+      [class.text-black]="!darkModeService.darkMode()"
+      [class.text-primary]="darkModeService.darkMode()"
+    >
+      An experience like nothing you have ever seen before. With fitness,
+      nutrition, and habit-coaching features, plus in-app messaging, progress
+      tracking, and more — it's everything you need to motivate and inspire.
+    </p>
+    <form
+      class="flex flex-col md:flex-row gap-3 justify-center items-center mb-3"
+    >
+      <a
+        href=""
+        class="text-2xl px-7 py-3 rounded-full font-semibold transform transition-transform duration-200 hover:scale-105"
+        [ngClass]="{
+          'text-white bg-black ': !darkModeService.darkMode(),
+          'text-primary bg-accent1': darkModeService.darkMode()
+        }"
+      >
+        Get started
+      </a>
+    </form>
+  </div>
+
+  <div
+    class="pt-20 pl-10 max-[700px]:pt-3 max-[1800px]:mx-auto max-[1800px]:w-[90%]"
+  >
+    <app-workout-plan></app-workout-plan>
+    <app-progress></app-progress>
+  </div>
+</section>
+
+

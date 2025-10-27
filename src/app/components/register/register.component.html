@@ -1,0 +1,162 @@
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="flex items-center justify-center min-h-screen p-4">
+  <div
+  id="auth-container"
+    class="p-8 rounded-2xl shadow-xl border transition-all duration-300
+           w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 max-w-2xl"
+    [ngClass]="{
+      'bg-white border-gray-200': !darkModeService.darkMode(),
+      'bg-gray-800 border-gray-700': darkModeService.darkMode()
+    }"
+  >
+    <div id="signin-form-container">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 1024 1024">
+            <path fill="currentColor" d="M858.5 763.6a374 374 0 0 0-80.6-119.5a375.63 375.63 0 0 0-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1c-.4.2-.8.3-1.2.5c-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 0 0-80.6 119.5A371.7 371.7 0 0 0 136 901.8a8 8 0 0 0 8 8.2h60c4.4 0 7.9-3.5 8-7.8c2-77.2 33-149.5 87.8-204.3c56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 0 0 8-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z" />
+          </svg>
+        </div>
+        <h2 [ngClass]="{
+          'text-white ': darkModeService.darkMode(),
+          
+        }" class="text-2xl font-bold  mb-2">Sign Up</h2>
+        <p class="text-gray-600 text-sm">Create your account to continue</p>
+      </div>
+
+      <form (ngSubmit)="onRegister()" class="flex flex-col gap-6">
+        <div>
+          <label
+            for="username"
+            class="block mb-2 font-semibold"
+            [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-primary': darkModeService.darkMode()
+            }"
+            >Username</label
+          >
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter your username"
+            [(ngModel)]="username"
+            name="username"
+            required
+            class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
+            [ngClass]="{
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+            }"
+          />
+        </div>
+        <div>
+          <label
+            for="email"
+            class="block mb-2 font-semibold"
+            [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-primary': darkModeService.darkMode()
+            }"
+            >Email</label
+          >
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            [(ngModel)]="email"
+            name="email"
+            required
+            class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
+            [ngClass]="{
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+            }"
+          />
+        </div>
+
+        <div>
+          <label
+            for="password"
+            class="block mb-2 font-semibold"
+            [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-primary': darkModeService.darkMode()
+            }"
+            >Password</label
+          >
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            name="password"
+            required
+            class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
+            [ngClass]="{
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+            }"
+          />
+        </div>
+  
+        <div>
+          <label
+            for="confirm-password"
+            class="block mb-2 font-semibold"
+            [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-primary': darkModeService.darkMode()
+            }"
+            >Confirm Password</label
+          >
+          <input
+            id="confirm-password"
+            type="password"
+            placeholder="••••••••"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            required
+            class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
+            [ngClass]="{
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+            }"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="mt-4 px-7 py-3 rounded-full font-semibold text-2xl transform transition-transform duration-200 hover:scale-105"
+          [ngClass]="{
+            'bg-black text-white hover:bg-gray-800': !darkModeService.darkMode(),
+            'bg-accent1 text-primary hover:bg-accent2': darkModeService.darkMode()
+          }"
+        >
+          Create Account
+        </button>
+      </form>
+
+      <div class="relative flex items-center my-6">
+        <div class="flex-grow border-t border-gray-300"></div>
+        <span class="flex-shrink mx-4 text-gray-500 text-sm">or continue with</span>
+        <div class="flex-grow border-t border-gray-300"></div>
+      </div>
+
+      <div class="space-y-3">
+        <button class="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300">
+          <img src="https://img.icons8.com/color/20/000000/google-logo.png" alt="Google" class="mr-3">
+          <span class="text-gray-700 font-medium">Google</span>
+        </button>
+        <button class="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300">
+          <img src="https://img.icons8.com/color/20/000000/facebook-new.png" alt="Facebook" class="mr-3">
+          <span class="text-gray-700 font-medium">Facebook</span>
+        </button>
+      </div>
+
+      <p class="text-center text-gray-600 text-sm mt-8">
+        Already have an account?
+        <button (click)="goToLogIn()" data-container="signup-form-container" id="signup-link-login" class="text-blue-600 hover:text-blue-800 font-semibold">
+          Login
+        </button>
+      </p>
+    </div>

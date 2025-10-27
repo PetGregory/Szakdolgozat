@@ -1,0 +1,162 @@
+<nav class="max-h-screen" style="  position:fixed;  z-index: 50; top: 0; left: 0; right: 0;" >
+  <div
+    class=" flex  justify-between  items-center  border-b border-gray-100 dark:border-none "
+    style="height:  6rem; margin: 0; padding: 0 10rem; "
+  [ngClass]="{
+          'bg-white hover:text-black': !darkModeService.darkMode(),
+          'bg-darkgray text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+    >
+    <div class="text-3xl font-semibold">
+      <a href="" id="home" 
+      class="  dark:hover:text-hovercolor"
+      [ngClass]="{
+          'text-black hover:text-hovercolor': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }" 
+      >BeStrong</a
+      
+        >
+    </div>
+
+
+    <button
+      class="xl:hidden text-3xl"
+      (click)="isMenuOpen = !isMenuOpen"
+      aria-label="Open menu"
+        *ngIf="darkModeService.darkMode(); else isHamburgerDark"
+      >
+      <img src="menu.png" alt="Hamburger_menu">
+    </button>
+
+    <ng-template #isHamburgerDark>
+    <button
+      class="xl:hidden text-3xl"
+      (click)="isMenuOpen = !isMenuOpen"
+      aria-label="Open menu"
+      >
+     <img src="menu2.png" alt="Hamburger menu"> 
+    </button>
+    </ng-template>
+
+    <div class="hidden xl:flex gap-12 items-center ml-8 text-2xl pl-10">
+      <a
+      *ngIf="isLoggedIn"
+        href="#"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+        >Workouts</a
+      >
+      <a
+        href="#"
+        *ngIf="isLoggedIn"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+        >Count the calories</a
+      >
+      <a
+        href="#"
+        *ngIf="isLoggedIn"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+        >Forum</a
+      >
+    </div>
+
+    <div class="hidden xl:flex items-center  ml-auto text-2xl">
+      <button (click)="goToLogin()"  [ngClass]="{
+        'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+        'text-primary hover:text-accent1': darkModeService.darkMode()
+      }" class="flex items-center gap-2"><p>Login</p></button>
+        
+      
+      <a href="#" class="flex items-center gap-2">
+      </a>
+    </div>
+    <div class="hidden xl:flex items-center  ml-auto text-2xl">
+      <button (click)="logout()"  [ngClass]="{
+        'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+        'text-primary hover:text-accent1': darkModeService.darkMode()
+      }" class="flex items-center gap-2"><p>Logout</p></button>
+        
+      
+      <a href="#" class="flex items-center gap-2">
+      </a>
+    </div>
+<!--
+    <div class="hidden xl:flex items-center gap-4 ml-auto">
+      <button
+        aria-label="Profil"
+        class="text-lg hover:underline"
+      >
+        <lucide-angular [img]="FileIcon" class="my-icon"></lucide-angular>
+      </button>
+
+     
+    </div>
+    -->
+  </div>
+
+  <div
+    *ngIf="isMenuOpen"
+    class="xl:hidden  px-10 py-4 flex flex-col gap-5 border-t border-gray-200"
+    
+    [ngClass]="{
+      'text-primary bg-darkgray ': darkModeService.darkMode(),
+      'text-black bg-white ': !darkModeService.darkMode
+    }"
+  
+  >
+  <a href="#" *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }"
+  >
+    <div class="flex justify-between items-center w-full text-2xl py-3">
+      
+        <p>Workouts</p>
+      <span>></span>
+    </div>
+    </a>
+
+    <a href="#"  *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full w-full text-2xl py-3">
+      <p>Count the calories</p>
+      <span>></span>
+    </div>
+    </a>
+
+<a href="#" *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"  [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full w-full text-2xl py-3">
+      <p>Forum</p>
+      <span>></span>
+    </div>
+</a>
+
+  <a href="#" style="width: 90%; margin: 0 auto;"  [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full w-full text-2xl py-3">
+      <p>Profil</p>
+      <span>></span>
+    </div>
+    </a>
+
+    
+  </div>
+</nav>
