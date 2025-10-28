@@ -15,16 +15,23 @@ import {AuthService} from '../../auth.service';
   styleUrl:'./navbar.component.css',
 })
 export class NavbarComponent {
-  constructor(public darkModeService: DarkModeService, private router : Router, private authService: AuthService) {}
-
+  
   isMenuOpen = false;
   isLoggedIn = false;
+  showProfileMenu = false;
+  constructor(public darkModeService: DarkModeService, private router : Router, private authService: AuthService) {}
+
+  currentUser$!: any;
+  
+  
   toggleDarkMode() {
     this.darkModeService.toggle();
   }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
+
+      this.currentUser$ = this.authService.currentUser$;
       this.isLoggedIn = !!user;
     });
   }
@@ -42,4 +49,13 @@ logout() {
   });
 }
 
+goToProfile() {
+  this.router.navigate(['/profile']);
+}
+goToStats() {
+  this.router.navigate(['/stats']);
+}
+toggleProfileMenu() {
+  this.showProfileMenu = !this.showProfileMenu;
+}
 }

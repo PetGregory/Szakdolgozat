@@ -69,26 +69,79 @@
       >
     </div>
 
-    <div class="hidden xl:flex items-center  ml-auto text-2xl">
-      <button (click)="goToLogin()"  [ngClass]="{
-        'text-gray-500 hover:text-black': !darkModeService.darkMode(),
-        'text-primary hover:text-accent1': darkModeService.darkMode()
-      }" class="flex items-center gap-2"><p>Login</p></button>
-        
+    <div class="hidden xl:flex items-center ml-auto text-2xl">
+      <button *ngIf="!(currentUser$ | async); else loggedInMenu"
+        (click)="goToLogin()"
+        class="flex items-center gap-2"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }">
+        <p>Login</p>
+      </button>
+
+      <ng-template #loggedInMenu>
+        <div class="relative">
+          <button
+            (click)="toggleProfileMenu()"
+            class="flex items-center gap-2 rounded-full border px-5 py-2 transition-transform duration-200 ease-in-out transform hover:scale-110"
+          >
+            <div class="hidden 2xl:flex items-center gap-4 ml-auto">
+              <button
+                aria-label="Profil"
+                class="text-lg hover:underline"
+              >
+                <lucide-angular [img]="FileIcon" class="my-icon"></lucide-angular>
+              </button>
+            </div>
+          </button>
       
-      <a href="#" class="flex items-center gap-2">
-      </a>
-    </div>
-    <div class="hidden xl:flex items-center  ml-auto text-2xl">
-      <button (click)="logout()"  [ngClass]="{
-        'text-gray-500 hover:text-black': !darkModeService.darkMode(),
-        'text-primary hover:text-accent1': darkModeService.darkMode()
-      }" class="flex items-center gap-2"><p>Logout</p></button>
-        
+          <div
+            *ngIf="showProfileMenu"
+            class="absolute right-0 mt-2 w-60 border rounded-lg shadow-lg z-50"
+            [ngClass]="{
+              'bg-white border-gray-200 text-gray-500': !darkModeService.darkMode(),
+              'bg-gray-800 border-gray-700 text-primary': darkModeService.darkMode()
+            }"
+          >
+            <button
+              (click)="goToProfile()"
+              class="block w-full text-left px-4 py-2"
+              [ngClass]="{
+                'hover:text-black': !darkModeService.darkMode(),
+                'hover:text-accent1': darkModeService.darkMode()
+              }"
+            >
+              Profil datas
+            </button>
       
-      <a href="#" class="flex items-center gap-2">
-      </a>
+            <button
+              (click)="goToStats()"
+              class="block w-full text-left px-4 py-2"
+              [ngClass]="{
+                'hover:text-black': !darkModeService.darkMode(),
+                'hover:text-accent1': darkModeService.darkMode()
+              }"
+            >
+              Statistics
+            </button>
+      
+            <button
+              (click)="logout()"
+              class="block w-full text-left px-4 py-2 text-red-600"
+              [ngClass]="{
+                'hover:text-black': !darkModeService.darkMode(),
+                'hover:text-accent1': darkModeService.darkMode()
+              }"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </ng-template>
+      
     </div>
+    
 <!--
     <div class="hidden xl:flex items-center gap-4 ml-auto">
       <button
@@ -147,7 +200,7 @@
     </div>
 </a>
 
-  <a href="#" style="width: 90%; margin: 0 auto;"  [ngClass]="{
+  <a href="#" *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"  [ngClass]="{
       'hover:text-accent1': darkModeService.darkMode(),
       'hover:text-black': !darkModeService.darkMode
     }">
@@ -157,6 +210,15 @@
     </div>
     </a>
 
+    <a href="#" *ngIf="!isLoggedIn" style="width: 90%; margin: 0 auto;"  [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full w-full text-2xl py-3">
+      <p>Login</p>
+      <span>></span>
+    </div>
+    </a>
     
   </div>
 </nav>
