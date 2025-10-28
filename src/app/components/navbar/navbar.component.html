@@ -8,15 +8,13 @@
         }"
     >
     <div class="text-3xl font-semibold">
-      <a href="" id="home" 
+      <button (click)="goToHome()" id="home" 
       class="  dark:hover:text-hovercolor"
       [ngClass]="{
           'text-black hover:text-hovercolor': !darkModeService.darkMode(),
           'text-primary hover:text-accent1': darkModeService.darkMode()
         }" 
-      >BeStrong</a
-      
-        >
+      >BeStrong</button>
     </div>
 
 

@@ -21,8 +21,10 @@
     <form
       class="flex flex-col md:flex-row gap-3 justify-center items-center mb-3"
     >
-      <a
-        href=""
+      <button
+        type="button"
+        *ngIf="!isLoggedIn"
+        (click)="goToLogIn()"
         class="text-2xl px-7 py-3 rounded-full font-semibold transform transition-transform duration-200 hover:scale-105"
         [ngClass]="{
           'text-white bg-black ': !darkModeService.darkMode(),
@@ -30,7 +32,7 @@
         }"
       >
         Get started
-      </a>
+      </button>
     </form>
   </div>
 

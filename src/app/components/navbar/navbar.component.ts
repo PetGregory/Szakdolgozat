@@ -40,12 +40,16 @@ export class NavbarComponent {
     this.router.navigate(['/login']);
   }
 
+  goToHome() {
+    this.router.navigate(['/home']);
+  }
+
   
 readonly FileIcon = User;
 
 logout() {
   this.authService.logout().subscribe(() => {
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   });
 }
 
