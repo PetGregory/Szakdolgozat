@@ -65,9 +65,9 @@ async function generateWorkoutPlan(userData) {
   let data;
   try {
     data = await loadWorkoutData();
-    console.log('📥 Loaded data keys:', Object.keys(data || {}));
+    console.log('Loaded data keys:', Object.keys(data || {}));
   } catch (error) {
-    console.error('❌ Error loading from Firestore, using fallback:', error.message);
+    console.error('Error loading from Firestore, using fallback:', error.message);
     // Fallback: használjuk a helyi fájlt
     const fs = require('fs');
     const path = require('path');
@@ -89,7 +89,7 @@ async function generateWorkoutPlan(userData) {
     throw new Error('Missing dayTemplates data');
   }
   
-  console.log('✅ All required data loaded:', {
+  console.log('All required data loaded:', {
     hasExercises: !!exercises,
     hasWorkoutTemplates: !!workoutTemplates,
     hasDayTemplates: !!dayTemplates,
@@ -97,8 +97,8 @@ async function generateWorkoutPlan(userData) {
   });
 
   // 2️⃣ Template kiválasztása a cél alapján
-  console.log('🎯 Selecting template:', { goal, fitnessLevel });
-  console.log('📋 Available goals:', Object.keys(workoutTemplates || {}));
+  console.log('Selecting template:', { goal, fitnessLevel });
+  console.log('Available goals:', Object.keys(workoutTemplates || {}));
   
   if (!workoutTemplates[goal]) {
     throw new Error(`Goal "${goal}" not found. Available goals: ${Object.keys(workoutTemplates || {}).join(', ')}`);
@@ -124,93 +124,93 @@ async function generateWorkoutPlan(userData) {
     availableDays
   });
   
-  // 2b️⃣ Validáció és automatikus kiigazítás: ha availableDays + rest day-ek száma > 7
-  const totalDays = availableDays + restDayCountInTemplate;
-  console.log(`🔍 Validation check: ${availableDays} workout days + ${restDayCountInTemplate} rest days = ${totalDays} days`);
+  // 2b️⃣ Validáció: A felhasználó által választott workout napok számát használjuk
+  // Mindig 7 nap lesz összesen, a maradék rest day lesz
+  console.log(`🔍 Validation check: ${availableDays} workout days selected, template has ${restDayCountInTemplate} rest days`);
   
-  let adjustedAvailableDays = availableDays;
-  
-  if (totalDays > 7) {
-    // Automatikusan csökkentjük a workout napok számát, hogy összesen 7 legyen
-    adjustedAvailableDays = 7 - restDayCountInTemplate;
-    console.log(`⚠️ Adjusting workout days: ${availableDays} → ${adjustedAvailableDays} to fit 7 days total (including ${restDayCountInTemplate} rest days)`);
-    
-    if (adjustedAvailableDays <= 0) {
-      throw new Error(
-        `Invalid workout schedule: Cannot create workout plan. The template contains ${restDayCountInTemplate} rest days, which exceeds the maximum 7 days per week.`
-      );
-    }
-  }
+  // Az adjustedAvailableDays = az eredeti, de biztosítjuk hogy ne legyen több mint 7
+  let adjustedAvailableDays = Math.min(availableDays, 7);
 
-  // 3️⃣ Edzés napok kiválasztása az adjustedAvailableDays alapján (rest day-ek NÉLKÜL)
-  console.log('📅 Selecting workout days:', {
+  // 3️⃣ Napok kiválasztása template sorrendben - MINDIG 7 nap lesz
+  // 1. Template sorrendben kiválasztjuk a kért számú workout napot
+  // 2. A template-ből hozzáadjuk a rest day-eket a helyükön
+  // 3. Ha még nincs 7 nap, rest day-ekkel töltjük fel
+  console.log('📅 Selecting days in template order (target: always 7 days):', {
     originalAvailableDays: availableDays,
     adjustedAvailableDays,
-    workoutDaysInTemplate,
+    template,
     dayTemplateKeys: Object.keys(dayTemplates)
   });
   
-  // Először szűrjük ki csak az érvényes napokat
-  const validWorkoutDays = workoutDaysInTemplate.filter(day => {
-    const exists = dayTemplates && dayTemplates[day];
-    if (!exists) {
-      console.warn(`⚠️ Invalid dayType in template: ${day} - skipping`);
+  const selectedDays = [];
+  let workoutDaysCount = 0;
+  
+  // Első kör: végigmegyünk a template-en, kiválasztjuk a workout napokat és a rest day-eket
+  for (let i = 0; i < template.length; i++) {
+    const dayType = template[i];
+    
+    if (dayType === 'rest day' || dayType === 'rest') {
+      // Rest day-t mindig hozzáadjuk a helyükön (de csak ha még nincs 7 nap)
+      if (selectedDays.length < 7) {
+        selectedDays.push(dayType);
+      }
+    } else if (dayTemplates && dayTemplates[dayType]) {
+      // Workout napot csak ha még van szükség rá és van hely (max 7 nap)
+      if (workoutDaysCount < adjustedAvailableDays && selectedDays.length < 7) {
+        selectedDays.push(dayType);
+        workoutDaysCount++;
+      }
+    } else {
+      console.warn(`⚠️ Skipping invalid dayType: ${dayType}`);
     }
-    return exists;
-  });
-  
-  console.log('✅ Valid workout days:', validWorkoutDays);
-  
-  if (validWorkoutDays.length === 0) {
-    throw new Error(`No valid workout days found in template. Available dayTemplates: ${Object.keys(dayTemplates || {}).join(', ')}`);
   }
   
-  const selectedWorkoutDays = [];
-  let i = 0;
-  let attempts = 0;
-  const maxAttempts = adjustedAvailableDays * 2; // Védés végtelen ciklus ellen
+  // Második kör: ha még nincs elég workout nap, körbevesszük a template-et (csak workout napokat)
+  let loopIndex = 0;
+  const maxLoops = template.length * 5; // Védés végtelen ciklus ellen
   
-  while (selectedWorkoutDays.length < adjustedAvailableDays && validWorkoutDays.length > 0 && attempts < maxAttempts) {
-    const day = validWorkoutDays[i % validWorkoutDays.length];
-    selectedWorkoutDays.push(day);
-    i++;
-    attempts++;
+  while (workoutDaysCount < adjustedAvailableDays && selectedDays.length < 7 && loopIndex < maxLoops) {
+    const dayType = template[loopIndex % template.length];
+    loopIndex++;
+    
+    // Rest day-eket kihagyjuk a kiegészítésből
+    if (dayType === 'rest day' || dayType === 'rest') {
+      continue;
+    }
+    
+    // Érvényes workout napot hozzáadjuk
+    if (dayTemplates && dayTemplates[dayType]) {
+      selectedDays.push(dayType);
+      workoutDaysCount++;
+    }
   }
   
-  if (selectedWorkoutDays.length === 0) {
-    throw new Error(`Failed to select workout days. Available valid days: ${validWorkoutDays.join(', ')}`);
+  // Harmadik kör: Ha még nincs 7 nap, rest day-ekkel töltjük fel
+  while (selectedDays.length < 7) {
+    selectedDays.push('rest day');
   }
   
-  console.log('✅ Selected workout days:', selectedWorkoutDays);
-  
-  
-  // 3a️⃣ Összevonjuk az edzés napokat és rest day-eket
-  const selectedDays = [...selectedWorkoutDays, ...restDaysInTemplate];
-  
-  console.log(`📋 Final selected days:`, selectedDays);
+  console.log('✅ Selected days in template order (7 days total):', selectedDays);
 
-  // Számoljuk újra a totalDays-t az adjusted értékekkel
-  const finalTotalDays = adjustedAvailableDays + restDayCountInTemplate;
+  // Számoljuk meg a ténylegesen kiválasztott rest day-eket
+  const actualRestDays = selectedDays.filter(d => d === 'rest day' || d === 'rest').length;
+  const actualTotalDays = 7; // Mindig 7 nap
 
   const workoutPlan = {
     weeks: 4,
     goal,
     fitnessLevel,
-    availableDays: adjustedAvailableDays, // Az adjusted értéket használjuk
+    availableDays: adjustedAvailableDays, // A felhasználó által választott workout napok száma
     originalAvailableDays: availableDays, // Eltároljuk az eredetit is info célból
-    restDays: restDayCountInTemplate,
-    totalDays: finalTotalDays,
+    restDays: actualRestDays, // A ténylegesen kiválasztott rest day-ek száma
+    totalDays: actualTotalDays, // Mindig 7
     days: []
   };
   
-  if (adjustedAvailableDays !== availableDays) {
-    console.log(`ℹ️ Workout days adjusted from ${availableDays} to ${adjustedAvailableDays} to accommodate rest days`);
-  }
-  
   console.log(`✅ Workout plan structure:`, {
+    workoutDays: workoutPlan.availableDays,
     restDays: workoutPlan.restDays,
     totalDays: workoutPlan.totalDays,
-    availableDays: workoutPlan.availableDays,
     originalAvailableDays: workoutPlan.originalAvailableDays
   });
 
@@ -306,8 +306,22 @@ async function generateWorkoutPlan(userData) {
     throw new Error('No valid workout days could be generated. Please check your workout templates and available days.');
   }
   
-  // Frissítjük a totalDays-t az actual napok száma alapján
-  workoutPlan.totalDays = workoutPlan.days.length;
+  // Biztosítjuk hogy mindig 7 nap legyen (ha valamiért kevesebb generálódott, rest day-ekkel pótoljuk)
+  while (workoutPlan.days.length < 7) {
+    workoutPlan.days.push({
+      day: workoutPlan.days.length + 1,
+      name: "Rest Day",
+      type: "rest",
+      isRestDay: true,
+      exercises: []
+    });
+  }
+  
+  // TotalDays mindig 7
+  workoutPlan.totalDays = 7;
+  
+  // Frissítjük a restDays számát a ténylegesen generált napok alapján
+  workoutPlan.restDays = workoutPlan.days.filter(d => d.isRestDay === true).length;
   
   console.log(`📤 Returning workout plan with:`, {
     restDays: workoutPlan.restDays,
