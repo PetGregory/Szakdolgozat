@@ -1,0 +1,96 @@
+{
+    "exercises": {
+      "chest": {
+        "name": "Chest Exercises",
+        "data": [
+          { "name": "Bench Press", "muscle": "chest", "equipment": "barbell" },
+          { "name": "Incline Dumbbell Press", "muscle": "chest", "equipment": "dumbbell" },
+          { "name": "Push-ups", "muscle": "chest", "equipment": "bodyweight" },
+          { "name": "Chest Flyes", "muscle": "chest", "equipment": "dumbbell" },
+          { "name": "Dips", "muscle": "chest", "equipment": "bodyweight" }
+        ]
+      },
+      "back": {
+        "name": "Back Exercises",
+        "data": [
+          { "name": "Pull-ups", "muscle": "back", "equipment": "bodyweight" },
+          { "name": "Bent-over Row", "muscle": "back", "equipment": "barbell" },
+          { "name": "Lat Pulldown", "muscle": "back", "equipment": "machine" },
+          { "name": "Deadlift", "muscle": "back", "equipment": "barbell" },
+          { "name": "T-Bar Row", "muscle": "back", "equipment": "barbell" }
+        ]
+      },
+      "shoulders": {
+        "name": "Shoulder Exercises",
+        "data": [
+          { "name": "Overhead Press", "muscle": "shoulders", "equipment": "barbell" },
+          { "name": "Lateral Raises", "muscle": "shoulders", "equipment": "dumbbell" },
+          { "name": "Rear Delt Flyes", "muscle": "shoulders", "equipment": "dumbbell" },
+          { "name": "Face Pulls", "muscle": "shoulders", "equipment": "cable" },
+          { "name": "Arnold Press", "muscle": "shoulders", "equipment": "dumbbell" }
+        ]
+      },
+      "legs": {
+        "name": "Leg Exercises",
+        "data": [
+          { "name": "Squats", "muscle": "legs", "equipment": "barbell" },
+          { "name": "Lunges", "muscle": "legs", "equipment": "bodyweight" },
+          { "name": "Leg Press", "muscle": "legs", "equipment": "machine" },
+          { "name": "Romanian Deadlift", "muscle": "legs", "equipment": "barbell" },
+          { "name": "Calf Raises", "muscle": "legs", "equipment": "bodyweight" }
+        ]
+      },
+      "arms": {
+        "name": "Arm Exercises",
+        "data": [
+          { "name": "Bicep Curls", "muscle": "biceps", "equipment": "dumbbell" },
+          { "name": "Tricep Dips", "muscle": "triceps", "equipment": "bodyweight" },
+          { "name": "Hammer Curls", "muscle": "biceps", "equipment": "dumbbell" },
+          { "name": "Overhead Tricep Extension", "muscle": "triceps", "equipment": "dumbbell" },
+          { "name": "Close-grip Bench Press", "muscle": "triceps", "equipment": "barbell" }
+        ]
+      },
+      "core": {
+        "name": "Core Exercises",
+        "data": [
+          { "name": "Plank", "muscle": "core", "equipment": "bodyweight" },
+          { "name": "Russian Twists", "muscle": "core", "equipment": "bodyweight" },
+          { "name": "Mountain Climbers", "muscle": "core", "equipment": "bodyweight" },
+          { "name": "Dead Bug", "muscle": "core", "equipment": "bodyweight" },
+          { "name": "Bicycle Crunches", "muscle": "core", "equipment": "bodyweight" }
+        ]
+      }
+    },
+    "workoutTemplates": {
+      "weight_loss": {
+        "beginner": ["full_body_1", "cardio", "full_body_2", "cardio", "full_body_3"],
+        "intermediate": ["push", "pull", "legs", "cardio", "push", "pull", "legs"],
+        "advanced": ["push", "pull", "legs", "cardio", "push", "pull", "cardio"]
+      },
+      "muscle_gain": {
+        "beginner": ["full_body_1", "rest", "full_body_2", "rest", "full_body_3", "rest", "rest"],
+        "intermediate": ["push", "pull", "legs", "rest", "push", "pull", "legs"],
+        "advanced": ["push", "pull", "legs", "push", "pull", "legs", "rest"]
+      },
+      "endurance": {
+        "beginner": ["cardio", "full_body_1", "cardio", "full_body_2", "cardio", "rest", "rest"],
+        "intermediate": ["cardio", "push", "cardio", "rest", "pull", "legs", "rest"],
+        "advanced": ["cardio", "push", "cardio", "pull", "cardio", "legs", "rest"]
+      },
+      "general_fitness": {
+        "beginner": ["full_body_1", "rest", "full_body_2", "rest", "full_body_3", "rest", "rest"],
+        "intermediate": ["push", "pull", "legs", "rest", "push", "pull", "legs"],
+        "advanced": ["push", "pull", "legs", "rest", "push", "pull", "legs"]
+      }
+    },
+    "dayTemplates": {
+      "full_body_1": { "name": "Full Body Workout A", "muscles": ["chest", "back", "legs", "shoulders", "arms", "core"], "exerciseCount": 6 },
+      "full_body_2": { "name": "Full Body Workout B", "muscles": ["chest", "back", "legs", "shoulders", "arms", "core"], "exerciseCount": 6 },
+      "full_body_3": { "name": "Full Body Workout C", "muscles": ["chest", "back", "legs", "shoulders", "arms", "core"], "exerciseCount": 6 },
+      "push": { "name": "Push Day", "muscles": ["chest", "shoulders", "arms"], "exerciseCount": 8 },
+      "pull": { "name": "Pull Day", "muscles": ["back", "arms"], "exerciseCount": 6 },
+      "legs": { "name": "Leg Day", "muscles": ["legs", "core"], "exerciseCount": 6 },
+      "cardio": { "name": "Cardio Day", "muscles": ["core"], "exerciseCount": 4 }
+    }
+  }
+  

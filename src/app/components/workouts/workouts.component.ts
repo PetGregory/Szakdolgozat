@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { WorkoutService, UserWorkoutData, WorkoutPlan } from '../../services/workout.service';
 import { DarkModeService } from '../dark-mode-service';
+import { Firestore, collection, doc, setDoc, getDocs } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-workouts',
@@ -46,7 +47,7 @@ export class WorkoutsComponent implements OnInit {
     private authService: AuthService,
     private workoutService: WorkoutService,
     private router: Router,
-    public darkModeService: DarkModeService
+    public darkModeService: DarkModeService,
   ) {}
 
   ngOnInit() {
@@ -106,9 +107,19 @@ export class WorkoutsComponent implements OnInit {
       const response = await this.workoutService.generateWorkoutPlan(workoutData).toPromise();
       this.generatedPlan = response?.workoutPlan || null;
       console.log('Workout generated successfully:', response);
-    } catch (error) {
+      console.log('Generated plan:', this.generatedPlan);
+      console.log('Rest days:', this.generatedPlan?.restDays);
+      console.log('Total days:', this.generatedPlan?.totalDays);
+      if (this.generatedPlan?.days) {
+        console.log('Days:', this.generatedPlan.days);
+        this.generatedPlan.days.forEach((day, index) => {
+          console.log(`Day ${index + 1}:`, day.name, 'isRestDay:', day.isRestDay);
+        });
+      }
+    } catch (error: any) {
       console.error('Error generating workout:', error);
-      alert('Failed to generate workout plan. Please try again.');
+      const errorMessage = error?.error?.details || error?.error?.error || error?.message || 'Failed to generate workout plan. Please try again.';
+      alert(errorMessage);
     } finally {
       this.isLoading = false;
     }
@@ -130,4 +141,6 @@ export class WorkoutsComponent implements OnInit {
   getProgressPercentage(): number {
     return (this.currentStep / this.totalSteps) * 100;
   }
+
+  
 }

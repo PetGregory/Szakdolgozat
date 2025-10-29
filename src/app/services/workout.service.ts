@@ -25,6 +25,7 @@ export interface WorkoutDay {
   day: number;
   name: string;
   type: string;
+  isRestDay?: boolean;
   exercises: Exercise[];
 }
 
@@ -33,6 +34,9 @@ export interface WorkoutPlan {
   goal: string;
   fitnessLevel: string;
   availableDays: number;
+  originalAvailableDays?: number;
+  restDays?: number;
+  totalDays?: number;
   days: WorkoutDay[];
 }
 

@@ -260,13 +260,31 @@
           }">
             🎉 Your Personalized Workout Plan
           </h2>
-          <div class="flex justify-center space-x-6 text-sm" [ngClass]="{
+          
+          <!-- Info message if days were adjusted -->
+          <div *ngIf="generatedPlan.originalAvailableDays && generatedPlan.originalAvailableDays !== generatedPlan.availableDays" 
+               class="mb-4 p-3 rounded-lg bg-yellow-50 border border-yellow-200"
+               [ngClass]="{
+                 'bg-yellow-50 border-yellow-200': !darkModeService.darkMode(),
+                 'bg-yellow-900 border-yellow-700': darkModeService.darkMode()
+               }">
+            <p class="text-sm" [ngClass]="{
+              'text-yellow-800': !darkModeService.darkMode(),
+              'text-yellow-200': darkModeService.darkMode()
+            }">
+              ℹ️ Workout days adjusted from {{ generatedPlan.originalAvailableDays }} to {{ generatedPlan.availableDays }} to accommodate {{ generatedPlan.restDays }} rest day(s)
+            </p>
+          </div>
+          
+          <div class="flex justify-center space-x-6 text-sm flex-wrap gap-2" [ngClass]="{
             'text-gray-600': !darkModeService.darkMode(),
             'text-gray-300': darkModeService.darkMode()
           }">
             <span><strong>Goal:</strong> {{ generatedPlan.goal.replace('_', ' ').toUpperCase() }}</span>
             <span><strong>Level:</strong> {{ generatedPlan.fitnessLevel.toUpperCase() }}</span>
-            <span><strong>Days:</strong> {{ generatedPlan.availableDays }}</span>
+            <span><strong>Workout Days:</strong> {{ generatedPlan.availableDays }}</span>
+            <span *ngIf="generatedPlan.restDays && generatedPlan.restDays > 0"><strong>Rest Days:</strong> {{ generatedPlan.restDays }}</span>
+            <span><strong>Total Days:</strong> {{ generatedPlan.totalDays || generatedPlan.days.length }}</span>
             <span><strong>Weeks:</strong> {{ generatedPlan.weeks }}</span>
           </div>
         </div>
@@ -275,8 +293,10 @@
           <div *ngFor="let day of generatedPlan.days" 
                class="border rounded-lg p-6"
                [ngClass]="{
-                 'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
-                 'border-gray-600 bg-gray-700': darkModeService.darkMode()
+                 'border-gray-200 bg-gray-50': !darkModeService.darkMode() && !(day.isRestDay === true),
+                 'border-gray-600 bg-gray-700': darkModeService.darkMode() && !(day.isRestDay === true),
+                 'border-green-300 bg-green-50': !darkModeService.darkMode() && (day.isRestDay === true),
+                 'border-green-600 bg-green-900': darkModeService.darkMode() && (day.isRestDay === true)
                }">
             
             <h3 class="text-xl font-semibold mb-4" [ngClass]="{
@@ -286,26 +306,49 @@
               Day {{ day.day }}: {{ day.name }}
             </h3>
             
-            <div class="space-y-3">
-              <div *ngFor="let exercise of day.exercises" 
-                   class="p-3 rounded border"
-                   [ngClass]="{
-                     'border-gray-200 bg-white': !darkModeService.darkMode(),
-                     'border-gray-600 bg-gray-800': darkModeService.darkMode()
-                   }">
-                <div class="font-medium" [ngClass]="{
-                  'text-gray-900': !darkModeService.darkMode(),
-                  'text-white': darkModeService.darkMode()
-                }">
-                  {{ exercise.name }}
+            <!-- Rest Day Content -->
+            <div *ngIf="day.isRestDay === true" class="text-center py-8">
+              <div class="text-6xl mb-4">😴</div>
+              <p class="text-lg font-medium" [ngClass]="{
+                'text-gray-700': !darkModeService.darkMode(),
+                'text-gray-200': darkModeService.darkMode()
+              }">
+                Rest and Recovery Day
+              </p>
+              <p class="text-sm mt-2" [ngClass]="{
+                'text-gray-600': !darkModeService.darkMode(),
+                'text-gray-400': darkModeService.darkMode()
+              }">
+                Take a break and let your muscles recover
+              </p>
+            </div>
+            
+            <!-- Workout Day Content -->
+            <div *ngIf="day.isRestDay !== true" class="space-y-3">
+              <div *ngIf="day.exercises && day.exercises.length > 0">
+                <div *ngFor="let exercise of day.exercises" 
+                     class="p-3 rounded border"
+                     [ngClass]="{
+                       'border-gray-200 bg-white': !darkModeService.darkMode(),
+                       'border-gray-600 bg-gray-800': darkModeService.darkMode()
+                     }">
+                  <div class="font-medium" [ngClass]="{
+                    'text-gray-900': !darkModeService.darkMode(),
+                    'text-white': darkModeService.darkMode()
+                  }">
+                    {{ exercise.name }}
+                  </div>
+                  <div class="text-sm" [ngClass]="{
+                    'text-gray-600': !darkModeService.darkMode(),
+                    'text-gray-300': darkModeService.darkMode()
+                  }">
+                    {{ exercise.sets }} sets × {{ exercise.reps }} reps
+                    <span class="ml-2">{{ exercise.rest }}s rest</span>
+                  </div>
                 </div>
-                <div class="text-sm" [ngClass]="{
-                  'text-gray-600': !darkModeService.darkMode(),
-                  'text-gray-300': darkModeService.darkMode()
-                }">
-                  {{ exercise.sets }} sets × {{ exercise.reps }} reps
-                  <span class="ml-2">{{ exercise.rest }}s rest</span>
-                </div>
+              </div>
+              <div *ngIf="!day.exercises || day.exercises.length === 0" class="text-center py-4 text-gray-500">
+                No exercises for this day
               </div>
             </div>
           </div>
