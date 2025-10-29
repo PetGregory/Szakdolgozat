@@ -6,10 +6,10 @@ import { WorkoutsComponent } from './components/workouts/workouts.component';
 
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
+    
     { path: 'home', component: IndexPageComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'workouts', component: WorkoutsComponent },
-    { path: '**', redirectTo: '/home' }
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
+import { UserService } from '../../services/user.service';
 import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -25,8 +25,8 @@ export class RegisterComponent {
     public darkModeService: DarkModeService,
     private router: Router,
     private authService: AuthService,
-    private auth: Auth,
-    private firestore: Firestore
+    private userService: UserService,
+    private auth: Auth
   ) {}
 
   toggleDarkMode() {
@@ -38,56 +38,6 @@ export class RegisterComponent {
   }
 
 
-  private async saveUserToFirestore(userId: string) {
-    try {
-      const userRef = doc(this.firestore, `users/${userId}`);
-      console.log('Saving user data to Firestore...');
-      
-      await setDoc(userRef, {
-        email: this.email,
-        username: this.username,
-        age: null,
-        weight: null,
-        height: null,
-        goal: null,
-        fitnessLevel: 'beginner',
-        availableDays: 0,
-        calorieTarget: null,
-        createdAt: new Date().toISOString()
-      });
-      
-      console.log('User data saved to Firestore successfully');
-    } catch (firestoreError) {
-      console.error('Firestore save error:', firestoreError);
-
-    }
-  }
-
-
-  private async saveGoogleUserToFirestore(user: any) {
-    try {
-      const userRef = doc(this.firestore, `users/${user.uid}`);
-      console.log('Saving Google user data to Firestore...');
-      
-      await setDoc(userRef, {
-        email: user.email,
-        username: user.displayName || '',
-        age: null,
-        weight: null,
-        height: null,
-        goal: null,
-        fitnessLevel: 'beginner',
-        availableDays: 0,
-        calorieTarget: null,
-        createdAt: new Date().toISOString()
-      }, { merge: true });
-      
-      console.log('Google user data saved to Firestore successfully');
-    } catch (firestoreError) {
-      console.error('Google Firestore save error:', firestoreError);
-      // Ez nem blokkolja a navigációt
-    }
-  }
 
   async onRegister(event?: Event) {
     if (event) {
@@ -126,8 +76,12 @@ export class RegisterComponent {
       if (userCredential?.user) {
         console.log('User created successfully:', userCredential.user.email);
         
-
-        this.saveUserToFirestore(userCredential.user.uid);
+        // User dokumentum létrehozása Firestore-ban a UserService segítségével
+        await this.userService.createUser(
+          userCredential.user.uid,
+          this.email,
+          this.username
+        );
 
         console.log('Registration successful!');
         alert('Registration successful!');
@@ -158,8 +112,12 @@ export class RegisterComponent {
       this.authService.currentUser$.next(result.user);
 
       if (result.user) {
-        // Firestore mentés külön metódusban
-        this.saveGoogleUserToFirestore(result.user);
+        // Google user dokumentum létrehozása/frissítése Firestore-ban a UserService segítségével
+        await this.userService.createOrUpdateGoogleUser(
+          result.user.uid,
+          result.user.email || '',
+          result.user.displayName || ''
+        );
 
         console.log('Google login/registration successful!');
         window.location.href = '/home';
@@ -167,7 +125,7 @@ export class RegisterComponent {
         throw new Error('Google authentication failed');
       }
     } catch (error: any) {
-      console.error('Google auth failed:', error);
+      console.error('Google auth failed:', error)
       alert('Google auth failed: ' + error.message);
     }
   }
