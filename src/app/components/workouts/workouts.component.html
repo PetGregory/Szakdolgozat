@@ -1,1 +1,326 @@
-<p>workouts works!</p>
+<div class="min-h-screen p-4" [ngClass]="{
+  'bg-gray-50': !darkModeService.darkMode(),
+  'bg-gray-900': darkModeService.darkMode()
+}">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-4" [ngClass]="{
+        'text-gray-900': !darkModeService.darkMode(),
+        'text-white': darkModeService.darkMode()
+      }">
+        🏋️ Create Your Workout Plan
+      </h1>
+      <p class="text-lg" [ngClass]="{
+        'text-gray-600': !darkModeService.darkMode(),
+        'text-gray-300': darkModeService.darkMode()
+      }">
+        Get a personalized workout plan based on your goals and fitness level
+      </p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium" [ngClass]="{
+          'text-gray-700': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">
+          Step {{ currentStep }} of {{ totalSteps }}
+        </span>
+        <span class="text-sm font-medium" [ngClass]="{
+          'text-gray-700': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">
+          {{ getProgressPercentage() | number:'1.0-0' }}%
+        </span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             [style.width.%]="getProgressPercentage()"></div>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white rounded-lg shadow-lg p-8" 
+         [ngClass]="{
+           'bg-white': !darkModeService.darkMode(),
+           'bg-gray-800': darkModeService.darkMode()
+         }">
+
+      <!-- Step 1: Basic Info -->
+      <div *ngIf="currentStep === 1" class="space-y-6">
+        <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white': darkModeService.darkMode()
+        }">
+          📊 Tell us about yourself
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium mb-2" [ngClass]="{
+              'text-gray-700': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              Age
+            </label>
+            <input type="number" 
+                   [(ngModel)]="userData.age"
+                   placeholder="25"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   [ngClass]="{
+                     'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
+                     'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+                   }">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-2" [ngClass]="{
+              'text-gray-700': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              Weight (kg)
+            </label>
+            <input type="number" 
+                   [(ngModel)]="userData.weight"
+                   placeholder="70"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   [ngClass]="{
+                     'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
+                     'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+                   }">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-2" [ngClass]="{
+              'text-gray-700': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              Height (cm)
+            </label>
+            <input type="number" 
+                   [(ngModel)]="userData.height"
+                   placeholder="170"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   [ngClass]="{
+                     'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
+                     'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+                   }">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Goal -->
+      <div *ngIf="currentStep === 2" class="space-y-6">
+        <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white': darkModeService.darkMode()
+        }">
+          🎯 What's your main goal?
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngFor="let goal of goals" 
+               class="p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+               [ngClass]="{
+                 'border-gray-200 hover:border-blue-500': !darkModeService.darkMode() && userData.goal !== goal.value,
+                 'border-blue-500 bg-blue-50': !darkModeService.darkMode() && userData.goal === goal.value,
+                 'border-gray-600 hover:border-blue-400': darkModeService.darkMode() && userData.goal !== goal.value,
+                 'border-blue-400 bg-blue-900': darkModeService.darkMode() && userData.goal === goal.value
+               }"
+               (click)="userData.goal = goal.value">
+            <div class="text-center">
+              <div class="text-3xl mb-2">{{ goal.icon }}</div>
+              <div class="font-medium" [ngClass]="{
+                'text-gray-900': !darkModeService.darkMode(),
+                'text-white': darkModeService.darkMode()
+              }">
+                {{ goal.label }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Fitness Level -->
+      <div *ngIf="currentStep === 3" class="space-y-6">
+        <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white': darkModeService.darkMode()
+        }">
+          💪 What's your fitness level?
+        </h2>
+        
+        <div class="space-y-4">
+          <div *ngFor="let level of fitnessLevels" 
+               class="p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+               [ngClass]="{
+                 'border-gray-200 hover:border-blue-500': !darkModeService.darkMode() && userData.fitnessLevel !== level.value,
+                 'border-blue-500 bg-blue-50': !darkModeService.darkMode() && userData.fitnessLevel === level.value,
+                 'border-gray-600 hover:border-blue-400': darkModeService.darkMode() && userData.fitnessLevel !== level.value,
+                 'border-blue-400 bg-blue-900': darkModeService.darkMode() && userData.fitnessLevel === level.value
+               }"
+               (click)="userData.fitnessLevel = level.value">
+            <div class="font-medium mb-1" [ngClass]="{
+              'text-gray-900': !darkModeService.darkMode(),
+              'text-white': darkModeService.darkMode()
+            }">
+              {{ level.label }}
+            </div>
+            <div class="text-sm" [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              {{ level.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Available Days -->
+      <div *ngIf="currentStep === 4" class="space-y-6">
+        <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white': darkModeService.darkMode()
+        }">
+          📅 How many days per week can you workout?
+        </h2>
+        
+        <div class="grid grid-cols-7 gap-2">
+          <div *ngFor="let day of [1,2,3,4,5,6,7]" 
+               class="p-4 border-2 rounded-lg cursor-pointer text-center transition-all duration-200 hover:scale-105"
+               [ngClass]="{
+                 'border-gray-200 hover:border-blue-500': !darkModeService.darkMode() && userData.availableDays !== day,
+                 'border-blue-500 bg-blue-50': !darkModeService.darkMode() && userData.availableDays === day,
+                 'border-gray-600 hover:border-blue-400': darkModeService.darkMode() && userData.availableDays !== day,
+                 'border-blue-400 bg-blue-900': darkModeService.darkMode() && userData.availableDays === day
+               }"
+               (click)="userData.availableDays = day">
+            <div class="font-medium" [ngClass]="{
+              'text-gray-900': !darkModeService.darkMode(),
+              'text-white': darkModeService.darkMode()
+            }">
+              {{ day }}
+            </div>
+            <div class="text-xs" [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              {{ day === 1 ? 'day' : 'days' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-between mt-8">
+        <button *ngIf="currentStep > 1" 
+                (click)="prevStep()"
+                class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                [ngClass]="{
+                  'border-gray-300 text-gray-700 hover:bg-gray-50': !darkModeService.darkMode(),
+                  'border-gray-600 text-gray-300 hover:bg-gray-700': darkModeService.darkMode()
+                }">
+          ← Previous
+        </button>
+        
+        <div *ngIf="currentStep < totalSteps" class="ml-auto">
+          <button (click)="nextStep()" 
+                  [disabled]="!canProceed()"
+                  class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            Next →
+          </button>
+        </div>
+        
+        <div *ngIf="currentStep === totalSteps" class="ml-auto">
+          <button (click)="generateWorkout()" 
+                  [disabled]="!canProceed() || isLoading"
+                  class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <span *ngIf="!isLoading">Generate Workout Plan 🚀</span>
+            <span *ngIf="isLoading">Generating...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Workout Plan -->
+    <div *ngIf="generatedPlan" class="mt-8">
+      <div class="bg-white rounded-lg shadow-lg p-8" 
+           [ngClass]="{
+             'bg-white': !darkModeService.darkMode(),
+             'bg-gray-800': darkModeService.darkMode()
+           }">
+        
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold mb-4" [ngClass]="{
+            'text-gray-900': !darkModeService.darkMode(),
+            'text-white': darkModeService.darkMode()
+          }">
+            🎉 Your Personalized Workout Plan
+          </h2>
+          <div class="flex justify-center space-x-6 text-sm" [ngClass]="{
+            'text-gray-600': !darkModeService.darkMode(),
+            'text-gray-300': darkModeService.darkMode()
+          }">
+            <span><strong>Goal:</strong> {{ generatedPlan.goal.replace('_', ' ').toUpperCase() }}</span>
+            <span><strong>Level:</strong> {{ generatedPlan.fitnessLevel.toUpperCase() }}</span>
+            <span><strong>Days:</strong> {{ generatedPlan.availableDays }}</span>
+            <span><strong>Weeks:</strong> {{ generatedPlan.weeks }}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let day of generatedPlan.days" 
+               class="border rounded-lg p-6"
+               [ngClass]="{
+                 'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
+                 'border-gray-600 bg-gray-700': darkModeService.darkMode()
+               }">
+            
+            <h3 class="text-xl font-semibold mb-4" [ngClass]="{
+              'text-gray-900': !darkModeService.darkMode(),
+              'text-white': darkModeService.darkMode()
+            }">
+              Day {{ day.day }}: {{ day.name }}
+            </h3>
+            
+            <div class="space-y-3">
+              <div *ngFor="let exercise of day.exercises" 
+                   class="p-3 rounded border"
+                   [ngClass]="{
+                     'border-gray-200 bg-white': !darkModeService.darkMode(),
+                     'border-gray-600 bg-gray-800': darkModeService.darkMode()
+                   }">
+                <div class="font-medium" [ngClass]="{
+                  'text-gray-900': !darkModeService.darkMode(),
+                  'text-white': darkModeService.darkMode()
+                }">
+                  {{ exercise.name }}
+                </div>
+                <div class="text-sm" [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-300': darkModeService.darkMode()
+                }">
+                  {{ exercise.sets }} sets × {{ exercise.reps }} reps
+                  <span class="ml-2">{{ exercise.rest }}s rest</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <button (click)="resetForm()" 
+                  class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors mr-4">
+            Create New Plan
+          </button>
+          <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Save Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

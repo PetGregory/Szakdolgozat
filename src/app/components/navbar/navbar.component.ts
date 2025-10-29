@@ -44,6 +44,10 @@ export class NavbarComponent {
     this.router.navigate(['/home']);
   }
 
+  goToWorkouts() {
+    this.router.navigate(['/workouts']);
+  }
+
   
 readonly FileIcon = User;
 

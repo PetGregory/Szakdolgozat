@@ -38,15 +38,14 @@
     </ng-template>
 
     <div class="hidden xl:flex gap-12 items-center ml-8 text-2xl pl-10">
-      <a
+      <button
       *ngIf="isLoggedIn"
-        href="#"
+        (click)="goToWorkouts()"
         [ngClass]="{
           'text-gray-500 hover:text-black': !darkModeService.darkMode(),
           'text-primary hover:text-accent1': darkModeService.darkMode()
         }"
-        >Workouts</a
-      >
+        >Workouts</button>
       <a
         href="#"
         *ngIf="isLoggedIn"
@@ -164,7 +163,7 @@
     }"
   
   >
-  <a href="#" *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"
+  <button *ngIf="isLoggedIn" (click)="goToWorkouts()" style="width: 90%; margin: 0 auto;"
     [ngClass]="{
       'hover:text-accent1': darkModeService.darkMode(),
       'hover:text-black': !darkModeService.darkMode
@@ -175,7 +174,7 @@
         <p>Workouts</p>
       <span>></span>
     </div>
-    </a>
+    </button>
 
     <a href="#"  *ngIf="isLoggedIn" style="width: 90%; margin: 0 auto;"
     [ngClass]="{
