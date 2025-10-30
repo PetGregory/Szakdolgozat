@@ -45,7 +45,12 @@ export class NavbarComponent {
   }
 
   goToWorkouts() {
+    this.isMenuOpen = false;
     this.router.navigate(['/workouts']);
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
   }
 
   

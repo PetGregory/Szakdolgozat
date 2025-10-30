@@ -1,4 +1,4 @@
-<div class="min-h-screen p-4">
+<div class="min-h-screen p-4" style="padding-top: 7rem;">
   <div class="max-w-4xl mx-auto">
 
     <div class="text-center mb-8">
@@ -63,7 +63,9 @@
                    min="13"
                    max="100"
                    step="1"
-                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                    [ngClass]="{
                      'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
                      'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode(),
@@ -91,7 +93,9 @@
                    min="30"
                    max="200"
                    step="0.1"
-                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   inputmode="decimal"
+                   autocomplete="off"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                    [ngClass]="{
                      'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
                      'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode(),
@@ -119,7 +123,9 @@
                    min="100"
                    max="250"
                    step="1"
-                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                    [ngClass]="{
                      'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
                      'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode(),
@@ -337,15 +343,18 @@
         </button>
         </div>
         
-        <div *ngIf="currentStep === totalSteps" class="ml-auto">
-          <button (click)="generateWorkout()" 
+        <div *ngIf="currentStep === totalSteps" class="ml-auto w-full sm:w-auto">
+          <button 
+                  type="button"
+                  (click)="generateWorkout($event)"
                   [disabled]="!canProceed() || isLoading"
                   [ngClass]="{
-                    'px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed':
+                    'px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto':
                       true,
-                    'bg-blue-600 text-white hover:bg-blue-700': !darkModeService.darkMode(),
-                    'bg-accent1 text-gray-900 hover:bg-accent2': darkModeService.darkMode(),
-                    'disabled:opacity-50 disabled:cursor-not-allowed': !canProceed() || isLoading
+                    'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800': !darkModeService.darkMode() && !isLoading && canProceed(),
+                    'bg-accent1 text-gray-900 hover:bg-accent2 active:opacity-80': darkModeService.darkMode() && !isLoading && canProceed(),
+                    'disabled:opacity-50 disabled:cursor-not-allowed': !canProceed() || isLoading,
+                    'bg-gray-400 cursor-not-allowed': isLoading || !canProceed()
                   }">
             <span *ngIf="!isLoading">Generate Workout Plan</span>
             <span *ngIf="isLoading">Generating...</span>

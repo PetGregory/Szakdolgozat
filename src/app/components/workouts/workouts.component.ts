@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../auth.service';
 import { WorkoutService, UserWorkoutData, WorkoutPlan } from '../../services/workout.service';
 import { DarkModeService } from '../dark-mode-service';
@@ -151,8 +152,19 @@ export class WorkoutsComponent implements OnInit {
     }
   }
 
-  async generateWorkout() {
-    if (!this.currentUser || !this.canProceed()) {
+  async generateWorkout(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (!this.currentUser) {
+      alert('Please log in to generate a workout plan');
+      return;
+    }
+
+    if (!this.canProceed()) {
+      alert('Please fill in all required fields correctly');
       return;
     }
 
@@ -169,24 +181,36 @@ export class WorkoutsComponent implements OnInit {
     };
 
     try {
-      const response = await this.workoutService.generateWorkoutPlan(workoutData).toPromise();
-      this.generatedPlan = response?.workoutPlan || null;
-      console.log('Workout generated successfully:', response);
-      console.log('Generated plan:', this.generatedPlan);
-      console.log('Rest days:', this.generatedPlan?.restDays);
-      console.log('Total days:', this.generatedPlan?.totalDays);
-      if (this.generatedPlan?.days) {
-        console.log('Days:', this.generatedPlan.days);
-        this.generatedPlan.days.forEach((day, index) => {
-          console.log(`Day ${index + 1}:`, day.name, 'isRestDay:', day.isRestDay);
+      console.log('🚀 Starting workout generation with data:', workoutData);
+      const response = await firstValueFrom(this.workoutService.generateWorkoutPlan(workoutData));
+      console.log('📦 Response received:', response);
+      
+      if (response && response.workoutPlan) {
+        this.generatedPlan = response.workoutPlan;
+        console.log('✅ Generated plan assigned:', this.generatedPlan);
+        console.log('📊 Plan details:', {
+          daysCount: this.generatedPlan.days?.length,
+          goal: this.generatedPlan.goal,
+          fitnessLevel: this.generatedPlan.fitnessLevel,
+          totalDays: this.generatedPlan.totalDays,
+          restDays: this.generatedPlan.restDays
         });
+        
+        // Scroll to top to show the generated plan
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        console.error('❌ Invalid response structure:', response);
+        alert('Failed to generate workout plan: Invalid response from server');
+        this.generatedPlan = null;
       }
     } catch (error: any) {
-      console.error('Error generating workout:', error);
-      const errorMessage = 'Failed to generate workout plan. Please try again.';
-      alert(errorMessage);
+      console.error('❌ Error generating workout:', error);
+      const errorMessage = error?.error?.details || error?.error?.error || error?.message || 'Failed to generate workout plan. Please try again.';
+      alert('Error: ' + errorMessage);
+      this.generatedPlan = null;
     } finally {
       this.isLoading = false;
+      console.log('🏁 Loading finished. Generated plan is:', this.generatedPlan ? 'SET' : 'NULL');
     }
   }
 

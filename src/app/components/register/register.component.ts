@@ -42,6 +42,13 @@ export class RegisterComponent {
   async onRegister(event?: Event) {
     if (event) {
       event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    // Validáció
+    if (!this.email || !this.username || !this.password || !this.confirmPassword) {
+      alert('Please fill in all fields');
+      return;
     }
     
     if (this.password !== this.confirmPassword) {
@@ -49,16 +56,18 @@ export class RegisterComponent {
       return;
     }
 
-    try {
+    if (this.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
 
+    try {
       console.log('Current auth state:', this.authService.isLoggedIn());
       console.log('Current user:', this.authService.firebaseAuth.currentUser?.email);
-
 
       if (this.authService.isLoggedIn()) {
         console.log('Logging out previous user before registration...');
         await firstValueFrom(this.authService.logout());
-
         await new Promise(resolve => setTimeout(resolve, 500));
       }
 
@@ -93,7 +102,10 @@ export class RegisterComponent {
       }
     } catch (error: any) {
       console.error('Registration failed:', error);
-      alert('Registration failed: ' + error.message);
+      const errorMessage = error?.code === 'auth/email-already-in-use' 
+        ? 'This email is already registered. Please try logging in instead.'
+        : error?.message || 'Registration failed. Please try again.';
+      alert('Registration failed: ' + errorMessage);
     }
   }
   

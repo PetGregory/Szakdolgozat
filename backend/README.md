@@ -1,119 +1,31 @@
-# Workout Generator Backend
+# BeStrong Backend API
 
-Node.js/Express API for generating personalized workout plans.
+Workout plan generáló backend API Render.com-ra deployolva.
 
-## Setup
+## 🚀 Render.com Deploy
 
-1. Install dependencies:
+1. **GitHub Repository**: https://github.com/PetGregory/beStrong-backend
+2. **Render URL**: (lesz beállítva a deploy után)
+3. **Build Command**: `npm install`
+4. **Start Command**: `npm start`
+
+## 📝 Lokális futtatás
+
 ```bash
 npm install
-```
-
-2. Create `.env` file with Firebase Admin SDK credentials:
-```bash
-cp .env.example .env
-```
-
-3. Get Firebase Admin SDK credentials:
-   - Go to Firebase Console → Project Settings → Service Accounts
-   - Generate new private key
-   - Copy the values to your `.env` file
-
-4. Start the server:
-```bash
 npm start
-# or for development with auto-restart:
-npm run dev
 ```
 
-## API Endpoints
+A server a `http://localhost:3000` címen fut.
 
-### POST /api/workouts/generate
-Generate a personalized workout plan.
+## 🔌 API Endpoints
 
-**Request Body:**
-```json
-{
-  "userId": "string",
-  "age": 25,
-  "weight": 70,
-  "height": 170,
-  "goal": "weight_loss|muscle_gain|endurance|general_fitness",
-  "fitnessLevel": "beginner|intermediate|advanced",
-  "availableDays": 3
-}
-```
+- `GET /health` - Health check
+- `POST /api/workouts/generate` - Workout plan generálása
 
-**Response:**
-```json
-{
-  "success": true,
-  "workoutId": "workout_id",
-  "workoutPlan": {
-    "weeks": 4,
-    "goal": "weight_loss",
-    "fitnessLevel": "beginner",
-    "availableDays": 3,
-    "days": [
-      {
-        "day": 1,
-        "name": "Full Body Workout A",
-        "type": "full_body_1",
-        "exercises": [
-          {
-            "name": "Bench Press",
-            "muscle": "chest",
-            "equipment": "barbell",
-            "sets": 3,
-            "reps": "8-12",
-            "rest": 60
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+## 📦 Függőségek
 
-### GET /api/workouts/:userId
-Get user's workout history.
-
-**Response:**
-```json
-{
-  "workouts": [
-    {
-      "id": "workout_id",
-      "userId": "user_id",
-      "userData": {...},
-      "workoutPlan": {...},
-      "createdAt": "2025-01-01T00:00:00.000Z"
-    }
-  ]
-}
-```
-
-## Features
-
-- **Rule-based workout generation** based on fitness level and goals
-- **Firebase Firestore integration** for data persistence
-- **CORS enabled** for frontend communication
-- **Comprehensive exercise database** with different muscle groups
-- **Flexible workout templates** for different goals and schedules
-
-## Workout Logic
-
-- **Beginner**: 3 sets, 8-12 reps, 60s rest
-- **Intermediate**: 4 sets, 6-10 reps, 90s rest  
-- **Advanced**: 5 sets, 4-8 reps, 120s rest
-
-**Goals:**
-- Weight Loss: Cardio-focused with full body workouts
-- Muscle Gain: Split routines with strength focus
-- Endurance: High-rep, cardio-intensive workouts
-- General Fitness: Balanced approach
-
-**Available Days:**
-- 1-3 days: Full body workouts
-- 4-5 days: Push/Pull/Legs split
-- 6-7 days: Advanced split with cardio
+- express
+- cors
+- dotenv
+- firebase-admin (opcionális, ha Firestore-t használnánk)
