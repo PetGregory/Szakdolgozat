@@ -229,5 +229,15 @@
     </div>
   </button>
     
+  <button *ngIf="isLoggedIn" (click)="logout(); closeMenu()" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full text-2xl py-3 text-red-600">
+      <p>Logout</p>
+      <span>></span>
+    </div>
+  </button>
   </div>
 </nav>

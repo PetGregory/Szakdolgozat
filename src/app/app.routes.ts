@@ -6,10 +6,10 @@ import { WorkoutsComponent } from './components/workouts/workouts.component';
 
 
 export const routes: Routes = [
-    
     { path: 'home', component: IndexPageComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'workouts', component: WorkoutsComponent },
+    { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

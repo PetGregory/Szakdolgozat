@@ -131,6 +131,11 @@ export class UserService {
       throw error;
     }
   }
+
+  async modifyUsername(userId: string, newUsername: string): Promise<UserData | null> {
+    await this.updateUser(userId, { username: newUsername });
+    return await this.getUser(userId);
+  }
   getUser$(userId: string): Observable<UserData | null> {
     return from(this.getUser(userId));
   }

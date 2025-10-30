@@ -1,0 +1,91 @@
+<div class="py-8 px-2 max-w-3xl mx-auto">
+    <!-- Profile Picture + Username + Email -->
+    <div class="rounded-xl  p-8 mb-8 w-full flex flex-col items-center shadow-none"
+         [ngClass]="{ 'bg-transparent': !darkModeService.darkMode(), 'bg-darkgray': darkModeService.darkMode() }">
+      <div class="w-48 h-48 border-2 border-gray-200 rounded-full overflow-hidden flex items-center justify-center mb-3"
+        [ngClass]="{ 'bg-white': !darkModeService.darkMode(), 'bg-gray-800': darkModeService.darkMode() }">
+        <ng-container *ngIf="profileImageUrl; else noPic">
+          <img [src]="profileImageUrl" alt="Profile picture" class="w-full h-full object-cover"/>
+        </ng-container>
+        <ng-template #noPic>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </ng-template>
+      </div>
+  
+      <div class="text-2xl font-bold mb-1 flex items-center gap-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-white': darkModeService.darkMode() }">
+        <span class="mr-1">Username:</span>
+        <ng-container *ngIf="!editingUsername; else usernameEdit">
+          <span>{{ user?.username || '-' }}</span>
+          <button (click)="startEditUsername()" class="ml-2 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition" aria-label="Edit username">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13.5V21h7.5M19.207 8.293a1 1 0 010 1.414l-6.5 6.5a1 1 0 01-.707.293H9v-2.586a1 1 0 01.293-.707l6.5-6.5a1 1 0 011.414 0z"/></svg>
+          </button>
+        </ng-container>
+        <ng-template #usernameEdit>
+          <input type="text" class="text-2xl font-bold border-b-2 border-gray-400 px-2 py-1 mr-2 focus:outline-none bg-transparent w-48" [(ngModel)]="newUsername" maxlength="20" autocomplete="off" />
+          <button
+            class="ml-1 px-5 py-2 text-base rounded-full font-semibold transition-transform duration-200 hover:scale-105 active:scale-95"
+            [disabled]="savingUsername"
+            [ngClass]="{
+              'bg-black text-white hover:bg-gray-800 disabled:bg-gray-400': !darkModeService.darkMode(),
+              'bg-accent1 text-primary hover:bg-accent2 disabled:opacity-60': darkModeService.darkMode()
+            }"
+            (click)="saveUsername()"
+          >
+            <span *ngIf="!savingUsername">Save</span>
+            <span *ngIf="savingUsername">Saving...</span>
+          </button>
+          <button
+            class="ml-2 px-5 py-2 text-base rounded-full font-semibold transition-transform duration-200 hover:scale-105 active:scale-95"
+            [ngClass]="{
+              'bg-gray-200 text-gray-800 hover:bg-gray-300': !darkModeService.darkMode(),
+              'bg-gray-700 text-white hover:bg-gray-600': darkModeService.darkMode()
+            }"
+            type="button"
+            (click)="cancelEditUsername()"
+          >
+            Cancel
+          </button>
+        </ng-template>
+      </div>
+      <div *ngIf="usernameError" class="mt-1 text-sm text-red-500">{{ usernameError }}</div>
+  
+      <div class="text-base" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">
+        <span class="mr-1" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Email:</span>
+        <span>{{ user?.email || '-' }}</span>
+      </div>
+    </div>
+  
+    <!-- Workout Plan Title -->
+    <div class="text-3xl font-bold mb-3 ml-1 text-left w-full tracking-tight" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-white': darkModeService.darkMode() }">Your Workout Plan</div>
+  
+    <!-- Workout Plan Section -->
+    <div class="rounded-xl shadow-lg p-8 flex flex-col items-center min-h-[160px] w-full mb-4"
+     [ngClass]="{ 'bg-white': !darkModeService.darkMode(), 'bg-gray-800': darkModeService.darkMode() }">
+      <ng-container *ngIf="user">
+        <ng-container *ngIf="vanEdzesterv; else noPlan">
+          <div class="flex flex-col items-center gap-5 w-full">
+            <div class="text-base font-medium self-start pl-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Goal</div>
+            <div class="text-2xl font-bold text-center" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">{{ user?.workout?.goal | uppercase }}</div>
+  
+            <div class="text-base font-medium self-start pl-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Level</div>
+            <div class="text-2xl font-bold text-center" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">{{ user?.workout?.fitnessLevel | uppercase }}</div>
+  
+            <div class="text-base font-medium self-start pl-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Workout Days</div>
+            <div class="text-2xl font-bold text-center" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">{{ user?.workout?.availableDays ?? '-' }}</div>
+          </div>
+          <button (click)="goToWorkoutDetail()" class="mt-6 rounded-full px-5 py-2 font-semibold transition-transform duration-200 hover:scale-105 active:scale-95"
+            [ngClass]="{ 'bg-black text-white hover:bg-gray-800': !darkModeService.darkMode(), 'bg-accent1 text-primary hover:bg-accent2': darkModeService.darkMode() }">
+            View Workout Plan
+          </button>
+        </ng-container>
+        <ng-template #noPlan>
+          <div class="text-md mb-4 text-center" [ngClass]="{ 'text-gray-900': !darkModeService.darkMode(), 'text-white': darkModeService.darkMode() }">No personal workout plan yet!</div>
+          <button (click)="goToWorkoutGen()" class="rounded-full px-5 py-2 font-semibold transition-transform duration-200 hover:scale-105 active:scale-95"
+            [ngClass]="{ 'bg-black text-white hover:bg-gray-800': !darkModeService.darkMode(), 'bg-accent1 text-primary hover:bg-accent2': darkModeService.darkMode() }">
+            Generate Workout Plan
+          </button>
+        </ng-template>
+      </ng-container>
+    </div>
+  </div>
+  
