@@ -13,5 +13,6 @@ export const routes: Routes = [
     { path: 'forgot-password', component: ForgotpasswordComponent },
     { path: 'workouts', component: WorkoutsComponent },
     { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
+    { path: 'nutrition', loadComponent: () => import('./components/nutrition/nutrition.component').then(m => m.NutritionComponent) },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

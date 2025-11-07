@@ -73,13 +73,10 @@ export class LoginComponent {
     this.generalError = null;
 
     this.authService.login(this.email.trim(), this.password).subscribe({
-      next: (user) => {
-        console.log('Login successful:', user);
+      next: () => {
         this.router.navigate(['/home']);
       },
-      error: (err) => {
-        console.error('Login failed:', err);
-        
+      error: () => {
         this.emailError = null;
         this.passwordError = null;
         this.generalError = 'Wrong email or password';

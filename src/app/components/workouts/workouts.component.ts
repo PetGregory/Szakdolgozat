@@ -220,37 +220,23 @@ export class WorkoutsComponent implements OnInit {
     };
 
     try {
-      console.log('🚀 Starting workout generation with data:', workoutData);
       const response = await firstValueFrom(this.workoutService.generateWorkoutPlan(workoutData));
-      console.log('📦 Response received:', response);
       
       if (response && response.workoutPlan) {
         this.generatedPlan = response.workoutPlan;
         this.generatedPlan.calorieTarget = this.calculateCalorieTarget();
-        console.log('✅ Generated plan assigned:', this.generatedPlan);
-        console.log('📊 Plan details:', {
-          daysCount: this.generatedPlan.days?.length,
-          goal: this.generatedPlan.goal,
-          fitnessLevel: this.generatedPlan.fitnessLevel,
-          totalDays: this.generatedPlan.totalDays,
-          restDays: this.generatedPlan.restDays,
-          calorieTarget: this.generatedPlan.calorieTarget
-        });
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        console.error('❌ Invalid response structure:', response);
         alert('Failed to generate workout plan: Invalid response from server');
         this.generatedPlan = null;
       }
     } catch (error: any) {
-      console.error('❌ Error generating workout:', error);
+      console.error('Error generating workout:', error);
       const errorMessage = error?.error?.details || error?.error?.error || error?.message || 'Failed to generate workout plan. Please try again.';
       alert('Error: ' + errorMessage);
       this.generatedPlan = null;
     } finally {
       this.isLoading = false;
-      console.log('🏁 Loading finished. Generated plan is:', this.generatedPlan ? 'SET' : 'NULL');
     }
   }
 
@@ -293,18 +279,17 @@ export class WorkoutsComponent implements OnInit {
         userDataToSave.calorieTarget = this.generatedPlan.calorieTarget;
       }
 
-      await this.userService.saveWorkoutPlan(
-        this.currentUser.uid,
-        this.generatedPlan,
-        userDataToSave
-      );
+             await this.userService.saveWorkoutPlan(
+               this.currentUser.uid,
+               this.generatedPlan,
+               userDataToSave
+             );
 
-      alert('Workout plan saved successfully!');
-      console.log('Workout plan saved to user document in Firestore');
-    } catch (error: any) {
-      console.error('Error saving workout plan:', error);
-      alert('Failed to save workout plan: ' + error.message);
-    }
+             alert('Workout plan saved successfully!');
+           } catch (error: any) {
+             console.error('Error saving workout plan:', error);
+             alert('Failed to save workout plan: ' + error.message);
+           }
   }
 
   

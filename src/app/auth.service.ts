@@ -19,7 +19,6 @@ export class AuthService {
 
   constructor() {
     onAuthStateChanged(this.firebaseAuth, (user) => {
-      console.log('🔥 Auth state changed:', user ? user.email : 'No user');
       this.currentUser$.next(user);
     });
   }
@@ -46,11 +45,10 @@ export class AuthService {
   logout(): Observable<void> {
     const promise = this.firebaseAuth.signOut()
       .then(async () => {
-        console.log("✅ User signed out successfully");
         await new Promise(resolve => setTimeout(resolve, 1000));
       })
       .catch((err) => {
-        console.error("❌ Logout error:", err);
+        console.error("Logout error:", err);
       });
     return from(promise);
   }  

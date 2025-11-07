@@ -129,38 +129,21 @@ export class RegisterComponent {
     this.generalError = null;
 
     try {
-      console.log('Current auth state:', this.authService.isLoggedIn());
-      console.log('Current user:', this.authService.firebaseAuth.currentUser?.email);
-
       if (this.authService.isLoggedIn()) {
-        console.log('Logging out previous user before registration...');
         await firstValueFrom(this.authService.logout());
         await new Promise(resolve => setTimeout(resolve, 500));
       }
-
-      console.log('Starting registration for:', this.email);
-      console.log('Email:', this.email);
-      console.log('Username:', this.username);
-      console.log('Password length:', this.password.length);
       
       const userCredential = await firstValueFrom(
         this.authService.register(this.email.trim(), this.username.trim(), this.password)
       );
-      
-      console.log('Registration completed, userCredential:', userCredential);
 
       if (userCredential?.user) {
-        console.log('User created successfully:', userCredential.user.email);
-        
         await this.userService.createUser(
           userCredential.user.uid,
           this.email.trim(),
           this.username.trim()
         );
-
-        console.log('Registration successful!');
-        console.log('Navigating to /home...');
-        
         window.location.href = '/home';
       } else {
         throw new Error('User creation failed');
@@ -181,13 +164,10 @@ export class RegisterComponent {
     try {
 
       if (this.authService.isLoggedIn()) {
-        console.log('Logging out previous user before Google auth...');
         await firstValueFrom(this.authService.logout());
       }
 
       const result = await signInWithPopup(this.auth, provider);
-      console.log('Google user:', result.user);
-
       this.authService.currentUser$.next(result.user);
 
       if (result.user) {
@@ -196,8 +176,6 @@ export class RegisterComponent {
           result.user.email || '',
           result.user.displayName || ''
         );
-
-        console.log('Google login/registration successful!');
         window.location.href = '/home';
       } else {
         throw new Error('Google authentication failed');

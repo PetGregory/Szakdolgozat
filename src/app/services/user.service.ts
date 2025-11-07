@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
+import { FoodEntry } from './nutrition.service';
 
 export interface UserData {
   id?: string;
@@ -19,6 +20,7 @@ export interface UserData {
   createdAt: string;
   updatedAt?: string;
   profileImageUrl?: string | null;
+  dailyCalorieIntake?: { [date: string]: FoodEntry[] };
 }
 
 @Injectable({
@@ -30,8 +32,6 @@ export class UserService {
   async createUser(userId: string, email: string, username: string): Promise<void> {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
-      console.log('Creating user document in Firestore...');
-      
       const userData: UserData = {
         email,
         username,
@@ -47,7 +47,6 @@ export class UserService {
       };
       
       await setDoc(userRef, userData);
-      console.log('User document created successfully in Firestore');
     } catch (error) {
       console.error('Error creating user document:', error);
       throw error;
@@ -57,8 +56,6 @@ export class UserService {
   async createOrUpdateGoogleUser(userId: string, email: string, username: string): Promise<void> {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
-      console.log('Creating/updating Google user document in Firestore...');
-      
       const userData: Partial<UserData> = {
         email,
         username: username || '',
@@ -74,7 +71,6 @@ export class UserService {
       };
       
       await setDoc(userRef, userData, { merge: true });
-      console.log('Google user document created/updated successfully in Firestore');
     } catch (error) {
       console.error('Error creating/updating Google user document:', error);
       throw error;
@@ -104,7 +100,6 @@ export class UserService {
         updatedAt: new Date().toISOString()
       };
       await updateDoc(userRef, updateData);
-      console.log('User document updated successfully');
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -129,7 +124,6 @@ export class UserService {
       }
       
       await updateDoc(userRef, updateData);
-      console.log('Workout plan saved to user document successfully');
     } catch (error) {
       console.error('Error saving workout plan:', error);
       throw error;
@@ -147,5 +141,62 @@ export class UserService {
   
   getUser$(userId: string): Observable<UserData | null> {
     return from(this.getUser(userId));
+  }
+
+  async addFoodEntry(userId: string, foodEntry: FoodEntry): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      const dailyIntake = user.dailyCalorieIntake || {};
+      
+      if (!dailyIntake[today]) {
+        dailyIntake[today] = [];
+      }
+      
+      dailyIntake[today].push(foodEntry);
+
+      await updateDoc(userRef, {
+        dailyCalorieIntake: dailyIntake,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error adding food entry:', error);
+      throw error;
+    }
+  }
+
+  async removeFoodEntry(userId: string, date: string, entryId: string): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user?.dailyCalorieIntake?.[date]) {
+        return;
+      }
+
+      const dailyIntake = { ...user.dailyCalorieIntake };
+      dailyIntake[date] = dailyIntake[date].filter(entry => entry.id !== entryId);
+
+      await updateDoc(userRef, {
+        dailyCalorieIntake: dailyIntake,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error removing food entry:', error);
+      throw error;
+    }
+  }
+
+  getDailyCalorieIntake(user: UserData, date: string): number {
+    if (!user.dailyCalorieIntake || !user.dailyCalorieIntake[date]) {
+      return 0;
+    }
+    return user.dailyCalorieIntake[date].reduce((total, entry) => total + entry.calories, 0);
   }
 }
