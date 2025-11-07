@@ -11,6 +11,7 @@ export interface UserWorkoutData {
   goal: string;
   fitnessLevel: string;
   availableDays: number;
+  gender?: string;
 }
 
 export interface Exercise {

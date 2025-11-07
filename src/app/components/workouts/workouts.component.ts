@@ -7,22 +7,28 @@ import { AuthService } from '../../auth.service';
 import { WorkoutService, UserWorkoutData, WorkoutPlan } from '../../services/workout.service';
 import { DarkModeService } from '../dark-mode-service';
 import { UserService } from '../../services/user.service';
+import { LucideAngularModule, Mars, Venus, VenusAndMars } from 'lucide-angular';
 
 @Component({
   selector: 'app-workouts',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './workouts.component.html',
   styleUrl: './workouts.component.css'
 })
 export class WorkoutsComponent implements OnInit {
   currentStep = 1;
-  totalSteps = 4;
+  totalSteps = 5;
   isLoading = false;
   generatedPlan: WorkoutPlan | null = null;
   currentUser: any = null;
+  
+  Mars = Mars;
+  Venus = Venus;
+  VenusAndMars = VenusAndMars;
 
   userData = {
+    gender: '',
     age: null as number | null,
     weight: null as number | null,
     height: null as number | null,
@@ -31,13 +37,18 @@ export class WorkoutsComponent implements OnInit {
     availableDays: 0
   };
 
-  // Validációs határok (public, hogy a template-ben is elérjük)
+  genders = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' }
+  ];
+
   readonly MIN_AGE = 13;
   readonly MAX_AGE = 100;
-  readonly MIN_WEIGHT = 30; // kg
-  readonly MAX_WEIGHT = 200; // kg
-  readonly MIN_HEIGHT = 100; // cm
-  readonly MAX_HEIGHT = 250; // cm
+  readonly MIN_WEIGHT = 30;
+  readonly MAX_WEIGHT = 200;
+  readonly MIN_HEIGHT = 100;
+  readonly MAX_HEIGHT = 250;
 
   goals = [
     { value: 'weight_loss', label: 'Weight Loss', icon: '🔥' },
@@ -81,7 +92,6 @@ export class WorkoutsComponent implements OnInit {
     }
   }
 
-  // Validációs metódusok
   validateAge(age: number | null): boolean {
     if (age === null) return false;
     return age >= this.MIN_AGE && age <= this.MAX_AGE;
@@ -97,7 +107,6 @@ export class WorkoutsComponent implements OnInit {
     return height >= this.MIN_HEIGHT && height <= this.MAX_HEIGHT;
   }
 
-  // Input változás kezelők validációval
   onAgeChange(value: number | null | string) {
     if (value === null || value === undefined || value === '' || isNaN(Number(value))) {
       this.userData.age = null;
@@ -106,8 +115,6 @@ export class WorkoutsComponent implements OnInit {
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     
-    // Negatív vagy túl nagy érték esetén is beállítjuk (hogy a hibaüzenet megjelenjen)
-    // Nem korlátozzuk automatikusan, a validáció és hibaüzenet jelezi a problémát
     this.userData.age = numValue;
   }
 
@@ -119,7 +126,6 @@ export class WorkoutsComponent implements OnInit {
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     
-    // Negatív vagy túl nagy érték esetén is beállítjuk (hogy a hibaüzenet megjelenjen)
     this.userData.weight = numValue;
   }
 
@@ -131,21 +137,22 @@ export class WorkoutsComponent implements OnInit {
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     
-    // Negatív vagy túl nagy érték esetén is beállítjuk (hogy a hibaüzenet megjelenjen)
     this.userData.height = numValue;
   }
 
   canProceed(): boolean {
     switch (this.currentStep) {
       case 1:
+        return this.userData.gender !== '';
+      case 2:
         return this.validateAge(this.userData.age) && 
                this.validateWeight(this.userData.weight) && 
                this.validateHeight(this.userData.height);
-      case 2:
-        return this.userData.goal !== '';
       case 3:
-        return this.userData.fitnessLevel !== '';
+        return this.userData.goal !== '';
       case 4:
+        return this.userData.fitnessLevel !== '';
+      case 5:
         return this.userData.availableDays > 0;
       default:
         return false;
@@ -177,7 +184,8 @@ export class WorkoutsComponent implements OnInit {
       height: this.userData.height || 175,
       goal: this.userData.goal,
       fitnessLevel: this.userData.fitnessLevel,
-      availableDays: this.userData.availableDays
+      availableDays: this.userData.availableDays,
+      gender: this.userData.gender
     };
 
     try {
@@ -196,7 +204,6 @@ export class WorkoutsComponent implements OnInit {
           restDays: this.generatedPlan.restDays
         });
         
-        // Scroll to top to show the generated plan
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         console.error('❌ Invalid response structure:', response);
@@ -217,6 +224,7 @@ export class WorkoutsComponent implements OnInit {
   resetForm() {
     this.currentStep = 1;
     this.userData = {
+      gender: '',
       age: null,
       weight: null,
       height: null,
@@ -238,11 +246,11 @@ export class WorkoutsComponent implements OnInit {
     }
 
     try {
-      // Workout terv mentése a UserService segítségével
       await this.userService.saveWorkoutPlan(
         this.currentUser.uid,
         this.generatedPlan,
         {
+          gender: this.userData.gender,
           age: this.userData.age,
           weight: this.userData.weight,
           height: this.userData.height,

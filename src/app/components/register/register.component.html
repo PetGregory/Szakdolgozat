@@ -24,6 +24,14 @@
         <p class="text-gray-600 text-sm">Create your account to continue</p>
       </div>
 
+      <div *ngIf="generalError" class="mb-4 p-3 rounded-lg border"
+           [ngClass]="{
+             'bg-red-50 border-red-200': !darkModeService.darkMode(),
+             'bg-red-900/20 border-red-700': darkModeService.darkMode()
+           }">
+        <p class="text-sm text-red-600">{{ generalError }}</p>
+      </div>
+      
       <form class="flex flex-col gap-6" novalidate>
         <div>
           <label
@@ -40,16 +48,20 @@
             type="text"
             placeholder="Enter your username"
             [(ngModel)]="username"
+            (input)="clearUsernameError()"
             name="username"
             autocomplete="username"
             required
             inputmode="text"
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200 text-base"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !usernameError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && usernameError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !usernameError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && usernameError
             }"
           />
+          <div *ngIf="usernameError" class="mt-1 text-sm text-red-500">{{ usernameError }}</div>
         </div>
         <div>
           <label
@@ -66,16 +78,20 @@
             type="email"
             placeholder="you@example.com"
             [(ngModel)]="email"
+            (input)="clearEmailError()"
             name="email"
             autocomplete="email"
             required
             inputmode="email"
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200 text-base"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !emailError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && emailError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !emailError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && emailError
             }"
           />
+          <div *ngIf="emailError" class="mt-1 text-sm text-red-500">{{ emailError }}</div>
         </div>
 
         <div>
@@ -93,15 +109,19 @@
             type="password"
             placeholder="••••••••"
             [(ngModel)]="password"
+            (input)="clearPasswordError()"
             name="password"
             autocomplete="new-password"
             required
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200 text-base"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !passwordError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && passwordError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !passwordError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && passwordError
             }"
           />
+          <div *ngIf="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</div>
         </div>
   
         <div>
@@ -119,15 +139,19 @@
             type="password"
             placeholder="••••••••"
             [(ngModel)]="confirmPassword"
+            (input)="clearConfirmPasswordError()"
             name="confirmPassword"
             autocomplete="new-password"
             required
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200 text-base"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !confirmPasswordError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && confirmPasswordError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !confirmPasswordError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && confirmPasswordError
             }"
           />
+          <div *ngIf="confirmPasswordError" class="mt-1 text-sm text-red-500">{{ confirmPasswordError }}</div>
         </div>
 
         <button

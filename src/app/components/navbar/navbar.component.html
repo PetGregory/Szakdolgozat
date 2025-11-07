@@ -140,22 +140,8 @@
       </ng-template>
       
     </div>
-    
-<!--
-    <div class="hidden xl:flex items-center gap-4 ml-auto">
-      <button
-        aria-label="Profil"
-        class="text-lg hover:underline"
-      >
-        <lucide-angular [img]="FileIcon" class="my-icon"></lucide-angular>
-      </button>
-
-     
-    </div>
-    -->
   </div>
 
-  <!-- Mobile Menu Backdrop -->
   <div
     *ngIf="isMenuOpen"
     class="xl:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
@@ -163,7 +149,6 @@
     style="top: 6rem;"
   ></div>
 
-  <!-- Mobile Menu -->
   <div
     *ngIf="isMenuOpen"
     class="xl:hidden px-4 py-4 flex flex-col gap-5 border-t border-gray-200 fixed left-0 right-0 z-40 max-h-[calc(100vh-6rem)] overflow-y-auto"

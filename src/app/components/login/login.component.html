@@ -23,6 +23,14 @@
         <p class="text-gray-600 text-sm">Access your account to continue</p>
       </div>
 
+      <div *ngIf="generalError" class="mb-4 p-3 rounded-lg border"
+           [ngClass]="{
+             'bg-red-50 border-red-200': !darkModeService.darkMode(),
+             'bg-red-900/20 border-red-700': darkModeService.darkMode()
+           }">
+        <p class="text-sm text-red-600">{{ generalError }}</p>
+      </div>
+
       <form class="flex flex-col gap-6" (ngSubmit)="onLogin()">
         <div>
           <label
@@ -38,15 +46,19 @@
             id="email"
             type="email"
             [(ngModel)]="email"
+            (input)="clearEmailError()"
             name="email"
             required
             placeholder="you@example.com"
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !emailError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && emailError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !emailError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && emailError
             }"
           />
+          <div *ngIf="emailError" class="mt-1 text-sm text-red-500">{{ emailError }}</div>
         </div>
   
         <div>
@@ -63,15 +75,29 @@
             id="password"
             type="password"
             [(ngModel)]="password"
+            (input)="clearPasswordError()"
             name="password"
             required
             placeholder="••••••••"
             class="w-full p-3 rounded-lg border outline-none transition-all duration-200"
             [ngClass]="{
-              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode(),
-              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode()
+              'border-gray-300 focus:border-black bg-white text-black': !darkModeService.darkMode() && !passwordError,
+              'border-red-500 bg-white text-black': !darkModeService.darkMode() && passwordError,
+              'border-gray-600 focus:border-accent1 bg-gray-700 text-primary': darkModeService.darkMode() && !passwordError,
+              'border-red-500 bg-gray-700 text-primary': darkModeService.darkMode() && passwordError
             }"
           />
+          <div *ngIf="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</div>
+        </div>
+
+        <div class="flex justify-end">
+          <button 
+            type="button"
+            (click)="goToForgotPassword()"
+            class="text-sm text-blue-600 hover:text-blue-800 font-semibold"
+          >
+            Forgot password?
+          </button>
         </div>
 
         <button

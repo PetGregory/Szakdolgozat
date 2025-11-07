@@ -21,6 +21,12 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
   
+  emailError: string | null = null;
+  usernameError: string | null = null;
+  passwordError: string | null = null;
+  confirmPasswordError: string | null = null;
+  generalError: string | null = null;
+  
   constructor(
     public darkModeService: DarkModeService,
     private router: Router,
@@ -37,7 +43,78 @@ export class RegisterComponent {
     this.router.navigate(['/login']);
   }
 
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 
+  private isValidUsername(username: string): boolean {
+    const trimmed = (username || '').trim();
+    if (trimmed.length < 3 || trimmed.length > 20) return false;
+    if (/[^a-zA-Z0-9_ .-]/.test(trimmed)) return false;
+    return true;
+  }
+
+  private validateForm(): boolean {
+    let isValid = true;
+    
+    this.emailError = null;
+    this.usernameError = null;
+    this.passwordError = null;
+    this.confirmPasswordError = null;
+    this.generalError = null;
+
+    if (!this.email || this.email.trim() === '') {
+      this.emailError = 'Email is required';
+      isValid = false;
+    } else if (!this.isValidEmail(this.email)) {
+      this.emailError = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    if (!this.username || this.username.trim() === '') {
+      this.usernameError = 'Username is required';
+      isValid = false;
+    } else if (!this.isValidUsername(this.username)) {
+      this.usernameError = 'Username must be 3-20 characters and contain only letters, numbers, spaces, dots, dashes, or underscores';
+      isValid = false;
+    }
+
+    if (!this.password || this.password === '') {
+      this.passwordError = 'Password is required';
+      isValid = false;
+    } else if (this.password.length < 6) {
+      this.passwordError = 'Password must be at least 6 characters long';
+      isValid = false;
+    }
+
+    if (!this.confirmPassword || this.confirmPassword === '') {
+      this.confirmPasswordError = 'Please confirm your password';
+      isValid = false;
+    } else if (this.password !== this.confirmPassword) {
+      this.confirmPasswordError = 'Passwords do not match';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  clearEmailError() {
+    this.emailError = null;
+  }
+
+  clearUsernameError() {
+    this.usernameError = null;
+  }
+
+  clearPasswordError() {
+    this.passwordError = null;
+    this.confirmPasswordError = null;
+  }
+
+  clearConfirmPasswordError() {
+    this.confirmPasswordError = null;
+  }
 
   async onRegister(event?: Event) {
     if (event) {
@@ -45,21 +122,11 @@ export class RegisterComponent {
       event.stopPropagation();
     }
     
-    // Validáció
-    if (!this.email || !this.username || !this.password || !this.confirmPassword) {
-      alert('Please fill in all fields');
-      return;
-    }
-    
-    if (this.password !== this.confirmPassword) {
-      alert('Passwords do not match!');
+    if (!this.validateForm()) {
       return;
     }
 
-    if (this.password.length < 6) {
-      alert('Password must be at least 6 characters long');
-      return;
-    }
+    this.generalError = null;
 
     try {
       console.log('Current auth state:', this.authService.isLoggedIn());
@@ -77,7 +144,7 @@ export class RegisterComponent {
       console.log('Password length:', this.password.length);
       
       const userCredential = await firstValueFrom(
-        this.authService.register(this.email, this.username, this.password)
+        this.authService.register(this.email.trim(), this.username.trim(), this.password)
       );
       
       console.log('Registration completed, userCredential:', userCredential);
@@ -85,15 +152,13 @@ export class RegisterComponent {
       if (userCredential?.user) {
         console.log('User created successfully:', userCredential.user.email);
         
-        // User dokumentum létrehozása Firestore-ban a UserService segítségével
         await this.userService.createUser(
           userCredential.user.uid,
-          this.email,
-          this.username
+          this.email.trim(),
+          this.username.trim()
         );
 
         console.log('Registration successful!');
-        alert('Registration successful!');
         console.log('Navigating to /home...');
         
         window.location.href = '/home';
@@ -102,10 +167,12 @@ export class RegisterComponent {
       }
     } catch (error: any) {
       console.error('Registration failed:', error);
-      const errorMessage = error?.code === 'auth/email-already-in-use' 
-        ? 'This email is already registered. Please try logging in instead.'
-        : error?.message || 'Registration failed. Please try again.';
-      alert('Registration failed: ' + errorMessage);
+      
+      this.emailError = null;
+      this.usernameError = null;
+      this.passwordError = null;
+      this.confirmPasswordError = null;
+      this.generalError = 'Invalid registration';
     }
   }
   
@@ -124,7 +191,6 @@ export class RegisterComponent {
       this.authService.currentUser$.next(result.user);
 
       if (result.user) {
-        // Google user dokumentum létrehozása/frissítése Firestore-ban a UserService segítségével
         await this.userService.createOrUpdateGoogleUser(
           result.user.uid,
           result.user.email || '',
@@ -137,8 +203,12 @@ export class RegisterComponent {
         throw new Error('Google authentication failed');
       }
     } catch (error: any) {
-      console.error('Google auth failed:', error)
-      alert('Google auth failed: ' + error.message);
+      console.error('Google auth failed:', error);
+      this.emailError = null;
+      this.usernameError = null;
+      this.passwordError = null;
+      this.confirmPasswordError = null;
+      this.generalError = 'Invalid registration';
     }
   }
 }

@@ -6,6 +6,7 @@ export interface UserData {
   id?: string;
   email: string;
   username: string;
+  gender?: string | null;
   age: number | null;
   weight: number | null;
   height: number | null;
@@ -17,6 +18,7 @@ export interface UserData {
   workoutUpdatedAt?: string;
   createdAt: string;
   updatedAt?: string;
+  profileImageUrl?: string | null;
 }
 
 @Injectable({
@@ -40,6 +42,7 @@ export class UserService {
         fitnessLevel: 'beginner',
         availableDays: 0,
         calorieTarget: null,
+        profileImageUrl: '0',
         createdAt: new Date().toISOString()
       };
       
@@ -66,6 +69,7 @@ export class UserService {
         fitnessLevel: 'beginner',
         availableDays: 0,
         calorieTarget: null,
+        profileImageUrl: '0',
         createdAt: new Date().toISOString()
       };
       
@@ -136,6 +140,11 @@ export class UserService {
     await this.updateUser(userId, { username: newUsername });
     return await this.getUser(userId);
   }
+
+  async setAvatarColor(userId: string, colorIndex: number): Promise<void> {
+    await this.updateUser(userId, { profileImageUrl: colorIndex.toString() } as Partial<UserData>);
+  }
+  
   getUser$(userId: string): Observable<UserData | null> {
     return from(this.getUser(userId));
   }

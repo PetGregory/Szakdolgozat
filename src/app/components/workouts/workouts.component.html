@@ -45,6 +45,69 @@
           'text-gray-900': !darkModeService.darkMode(),
           'text-white': darkModeService.darkMode()
         }">
+          What's your gender?
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div *ngFor="let gender of genders" 
+               class="p-6 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+               [ngClass]="{
+                 'border-gray-200 hover:border-blue-500': !darkModeService.darkMode() && userData.gender !== gender.value,
+                 'border-blue-500 bg-blue-50': !darkModeService.darkMode() && userData.gender === gender.value,
+                 'border-gray-600 hover:border-blue-400': darkModeService.darkMode() && userData.gender !== gender.value,
+                 'border-blue-400 bg-blue-900': darkModeService.darkMode() && userData.gender === gender.value
+               }"
+               (click)="userData.gender = gender.value">
+            <div class="text-center">
+              <div class="flex justify-center mb-3">
+                <ng-container [ngSwitch]="gender.value">
+                  <lucide-angular *ngSwitchCase="'male'" 
+                                 [img]="Mars" 
+                                 [size]="48"
+                                 class="transition-colors"
+                                 [ngClass]="{
+                                   'text-gray-400': userData.gender !== gender.value,
+                                   'text-blue-600': !darkModeService.darkMode() && userData.gender === gender.value,
+                                   'text-blue-400': darkModeService.darkMode() && userData.gender === gender.value
+                                 }">
+                  </lucide-angular>
+                  <lucide-angular *ngSwitchCase="'female'" 
+                                 [img]="Venus" 
+                                 [size]="48"
+                                 class="transition-colors"
+                                 [ngClass]="{
+                                   'text-gray-400': userData.gender !== gender.value,
+                                   'text-blue-600': !darkModeService.darkMode() && userData.gender === gender.value,
+                                   'text-blue-400': darkModeService.darkMode() && userData.gender === gender.value
+                                 }">
+                  </lucide-angular>
+                  <lucide-angular *ngSwitchDefault 
+                                 [img]="VenusAndMars" 
+                                 [size]="48"
+                                 class="transition-colors"
+                                 [ngClass]="{
+                                   'text-gray-400': userData.gender !== gender.value,
+                                   'text-blue-600': !darkModeService.darkMode() && userData.gender === gender.value,
+                                   'text-blue-400': darkModeService.darkMode() && userData.gender === gender.value
+                                 }">
+                  </lucide-angular>
+                </ng-container>
+              </div>
+              <div class="font-medium" [ngClass]="{
+                'text-gray-900': !darkModeService.darkMode(),
+                'text-white': darkModeService.darkMode()
+              }">
+                {{ gender.label }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="currentStep === 2" class="space-y-6">
+        <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white': darkModeService.darkMode()
+        }">
           Tell us about yourself
         </h2>
         
@@ -140,7 +203,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="currentStep === 2" class="space-y-6">
+      <div *ngIf="currentStep === 3" class="space-y-6">
         <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
           'text-gray-900': !darkModeService.darkMode(),
           'text-white': darkModeService.darkMode()
@@ -213,7 +276,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="currentStep === 3" class="space-y-6">
+      <div *ngIf="currentStep === 4" class="space-y-6">
         <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
           'text-gray-900': !darkModeService.darkMode(),
           'text-white': darkModeService.darkMode()
@@ -282,7 +345,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="currentStep === 4" class="space-y-6">
+      <div *ngIf="currentStep === 5" class="space-y-6">
         <h2 class="text-2xl font-semibold mb-6" [ngClass]="{
           'text-gray-900': !darkModeService.darkMode(),
           'text-white': darkModeService.darkMode()
@@ -379,7 +442,7 @@
                 
           <div class="flex justify-center space-x-6 text-sm flex-wrap gap-2" [ngClass]="{
             'text-gray-600': !darkModeService.darkMode(),
-            'text-gray-300': darkModeService.darkMode()
+            'text-white': darkModeService.darkMode()
           }">
             <span><strong>Goal:</strong> {{ generatedPlan.goal.replace('_', ' ').toUpperCase() }}</span>
             <span><strong>Level:</strong> {{ generatedPlan.fitnessLevel.toUpperCase() }}</span>

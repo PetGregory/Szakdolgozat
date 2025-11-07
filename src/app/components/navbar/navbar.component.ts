@@ -1,4 +1,3 @@
-// navbar.component.ts
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { LucideAngularModule, User } from 'lucide-angular';
 import { CommonModule } from '@angular/common';

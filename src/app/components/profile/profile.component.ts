@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
 import { UserService, UserData } from '../../services/user.service';
@@ -11,13 +11,22 @@ import { DarkModeService } from '../dark-mode-service';
   standalone: true,
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, UpperCasePipe]
 })
 export class ProfileComponent implements OnInit {
   user: UserData | null = null;
   loading = true;
   errorMsg: string | null = null;
   profileImageUrl: string | null = null;
+  
+  public COLORS: string[] = [
+    '#facc15','#fde047','#fb7185','#f87171','#84cc16',
+    '#34d399','#10b981','#60a5fa','#3b82f6','#818cf8',
+    '#a78bfa','#c084fc','#38bdf8','#0ea5e9','#f472b6',
+    '#fb7185','#ef4444','#06b6d4','#f97316','#dc2626',
+    '#22c55e','#f59e0b','#eab308','#14b8a6','#8b5cf6'
+  ];
+  showAvatarPicker = false;
 
   editingUsername = false;
   newUsername = '';
@@ -28,7 +37,8 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
-    public darkModeService: DarkModeService
+    public darkModeService: DarkModeService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -42,7 +52,11 @@ export class ProfileComponent implements OnInit {
         const uid = firebaseUser.uid;
         try {
           this.user = await this.userService.getUser(uid);
-          this.profileImageUrl = (this.user && (this.user as any).profileImageUrl) ? (this.user as any).profileImageUrl : null;
+          if (this.user && (!this.user.profileImageUrl || this.user.profileImageUrl === null)) {
+            await this.userService.setAvatarColor(uid, 0);
+            this.user = await this.userService.getUser(uid);
+          }
+          this.profileImageUrl = this.user?.profileImageUrl || null;
         } catch (error: any) {
           this.errorMsg = error?.message || 'Unexpected error';
         }
@@ -52,6 +66,38 @@ export class ProfileComponent implements OnInit {
         this.errorMsg = err?.message || 'Auth error';
         this.loading = false;
       }
+    });
+  }
+
+  toInt(value: string | null | undefined): number {
+    return parseInt(value ?? '0', 10);
+  }
+
+  getAvatarLetter(): string {
+    return this.user?.username?.charAt(0)?.toUpperCase() || '?';
+  }
+
+  getProfileLetterSvg(): string {
+    const idx = this.toInt(this.profileImageUrl);
+    const color = this.COLORS[idx % this.COLORS.length] || '#64748b';
+    const ch = this.getAvatarLetter();
+    return `<svg viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='${color}'/><text x='50' y='62' text-anchor='middle' font-size='42' fill='#fff' font-family='Arial' font-weight='500'>${ch}</text></svg>`;
+  }
+
+  getCurrentColor(): string {
+    const idx = this.toInt(this.profileImageUrl);
+    return this.COLORS[idx % this.COLORS.length] || '#64748b';
+  }
+
+  public selectAvatarColor(idx: number): void {
+    if (!this.user) return;
+    this.userService.setAvatarColor(this.user.id!, idx).then(() => {
+      if (this.user) this.user.profileImageUrl = idx.toString();
+      this.profileImageUrl = idx.toString();
+      this.showAvatarPicker = false;
+      this.cdr.detectChanges();
+    }).catch(e => {
+      this.errorMsg = e?.message || 'Failed to set avatar color';
     });
   }
 
@@ -104,21 +150,5 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/workout-detail']);
   }
 
-  mapGoal(goal: string): string {
-    switch(goal) {
-      case 'endurance': return 'Endurance';
-      case 'muscle_gain': return 'Muscle Gain';
-      case 'weight_loss': return 'Weight Loss';
-      case 'general_fitness': return 'General Fitness';
-      default: return goal ? goal.charAt(0).toUpperCase() + goal.slice(1) : '';
-    }
-  }
-  mapLevel(level: string): string {
-    switch(level) {
-      case 'beginner': return 'Beginner';
-      case 'intermediate': return 'Intermediate';
-      case 'advanced': return 'Advanced';
-      default: return level ? level.charAt(0).toUpperCase() + level.slice(1) : '';
-    }
-  }
+
 }
