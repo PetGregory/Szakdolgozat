@@ -56,19 +56,31 @@ export class UserService {
   async createOrUpdateGoogleUser(userId: string, email: string, username: string): Promise<void> {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
+      const existingUser = await this.getUser(userId);
+      
+      let finalUsername = username || '';
+      if (!finalUsername && email) {
+        finalUsername = email.split('@')[0];
+      }
+      
       const userData: Partial<UserData> = {
         email,
-        username: username || '',
-        age: null,
-        weight: null,
-        height: null,
-        goal: null,
-        fitnessLevel: 'beginner',
-        availableDays: 0,
-        calorieTarget: null,
-        profileImageUrl: '0',
-        createdAt: new Date().toISOString()
+        username: finalUsername
       };
+
+      if (!existingUser) {
+        userData.age = null;
+        userData.weight = null;
+        userData.height = null;
+        userData.goal = null;
+        userData.fitnessLevel = 'beginner';
+        userData.availableDays = 0;
+        userData.calorieTarget = null;
+        userData.profileImageUrl = '0';
+        userData.createdAt = new Date().toISOString();
+      } else {
+        userData.updatedAt = new Date().toISOString();
+      }
       
       await setDoc(userRef, userData, { merge: true });
     } catch (error) {

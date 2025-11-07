@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { DarkModeService } from '../dark-mode-service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
+import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +15,7 @@ import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
   styleUrls: ['./login.component.css'],
   imports: [CommonModule, FormsModule]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   email: string = '';
   password: string = '';
   
@@ -22,12 +24,28 @@ export class LoginComponent {
   generalError: string | null = null;
 
   auth = inject(Auth);
+  private authSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     public darkModeService: DarkModeService
   ) {}
+
+  ngOnInit() {
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.router.navigate(['/home']);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
 
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -90,7 +108,17 @@ export class LoginComponent {
     this.generalError = null;
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(this.auth, provider);
+      const result = await signInWithPopup(this.auth, provider);
+      this.authService.currentUser$.next(result.user);
+      
+      if (result.user) {
+        await this.userService.createOrUpdateGoogleUser(
+          result.user.uid,
+          result.user.email || '',
+          result.user.displayName || ''
+        );
+      }
+      
       this.router.navigate(['/home']);
     } catch (error: any) {
       console.error('Google login failed:', error);

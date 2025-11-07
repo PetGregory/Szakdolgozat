@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DarkModeService } from '../dark-mode-service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
 import { UserService } from '../../services/user.service';
 import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./register.component.css'],
   imports: [CommonModule, FormsModule]
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit, OnDestroy {
   email = '';
   username = '';
   password = '';
@@ -27,6 +27,8 @@ export class RegisterComponent {
   confirmPasswordError: string | null = null;
   generalError: string | null = null;
   
+  private authSubscription?: Subscription;
+  
   constructor(
     public darkModeService: DarkModeService,
     private router: Router,
@@ -34,6 +36,20 @@ export class RegisterComponent {
     private userService: UserService,
     private auth: Auth
   ) {}
+
+  ngOnInit() {
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.router.navigate(['/home']);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
 
   toggleDarkMode() {
     this.darkModeService.toggle();
@@ -144,6 +160,10 @@ export class RegisterComponent {
           this.email.trim(),
           this.username.trim()
         );
+        
+        // Várunk egy kicsit, hogy biztosan mentve legyen
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         window.location.href = '/home';
       } else {
         throw new Error('User creation failed');

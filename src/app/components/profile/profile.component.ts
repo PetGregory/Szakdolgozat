@@ -16,7 +16,6 @@ import { DarkModeService } from '../dark-mode-service';
 export class ProfileComponent implements OnInit {
   user: UserData | null = null;
   loading = true;
-  errorMsg: string | null = null;
   profileImageUrl: string | null = null;
   
   public COLORS: string[] = [
@@ -50,20 +49,27 @@ export class ProfileComponent implements OnInit {
           return;
         }
         const uid = firebaseUser.uid;
-        try {
+        this.user = await this.userService.getUser(uid);
+
+        if (!this.user && firebaseUser) {
+          const email = firebaseUser.email || '';
+          const displayName = firebaseUser.displayName || '';
+          const username = displayName || (email ? email.split('@')[0] : '');
+          
+          await this.userService.createOrUpdateGoogleUser(uid, email, username);
           this.user = await this.userService.getUser(uid);
-          if (this.user && (!this.user.profileImageUrl || this.user.profileImageUrl === null)) {
-            await this.userService.setAvatarColor(uid, 0);
-            this.user = await this.userService.getUser(uid);
-          }
-          this.profileImageUrl = this.user?.profileImageUrl || null;
-        } catch (error: any) {
-          this.errorMsg = error?.message || 'Unexpected error';
         }
+        
+        if (this.user && (!this.user.profileImageUrl || this.user.profileImageUrl === null)) {
+          await this.userService.setAvatarColor(uid, 0);
+          this.user = await this.userService.getUser(uid);
+        }
+        this.profileImageUrl = this.user?.profileImageUrl || null;
+        
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        this.errorMsg = err?.message || 'Auth error';
+      error: () => {
         this.loading = false;
       }
     });
@@ -96,8 +102,6 @@ export class ProfileComponent implements OnInit {
       this.profileImageUrl = idx.toString();
       this.showAvatarPicker = false;
       this.cdr.detectChanges();
-    }).catch(e => {
-      this.errorMsg = e?.message || 'Failed to set avatar color';
     });
   }
 
