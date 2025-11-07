@@ -40,6 +40,7 @@ export interface WorkoutPlan {
   restDays?: number;
   totalDays?: number;
   days: WorkoutDay[];
+  calorieTarget?: number;
 }
 
 export interface WorkoutResponse {

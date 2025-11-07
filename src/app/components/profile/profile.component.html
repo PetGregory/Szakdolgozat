@@ -88,6 +88,9 @@
   
             <div class="text-base font-medium self-start pl-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Workout Days</div>
             <div class="text-2xl font-bold text-center" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">{{ user?.workout?.availableDays ?? '-' }}</div>
+
+            <div *ngIf="user?.calorieTarget" class="text-base font-medium self-start pl-2" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-primary': darkModeService.darkMode() }">Daily Calorie Target</div>
+            <div *ngIf="user?.calorieTarget" class="text-2xl font-bold text-center" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">{{ user?.calorieTarget }} kcal</div>
           </div>
           <button (click)="goToWorkoutDetail()" class="mt-6 rounded-full px-5 py-2 font-semibold transition-transform duration-200 hover:scale-105 active:scale-95"
             [ngClass]="{ 'bg-black text-white hover:bg-gray-800': !darkModeService.darkMode(), 'bg-accent1 text-primary hover:bg-accent2': darkModeService.darkMode() }">

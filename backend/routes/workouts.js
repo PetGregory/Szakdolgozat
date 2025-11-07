@@ -4,7 +4,7 @@ const { generateWorkoutPlan } = require('../services/workoutGenerator');
 
 router.post('/generate', async (req, res) => {
   try {
-    const { userId, age, weight, height, goal, fitnessLevel, availableDays } = req.body;
+    const { userId, age, weight, height, goal, fitnessLevel, availableDays, gender } = req.body;
 
     if (!userId || !goal || !fitnessLevel || !availableDays) {
       return res.status(400).json({
@@ -18,7 +18,8 @@ router.post('/generate', async (req, res) => {
       height: height || 170,
       goal,
       fitnessLevel,
-      availableDays
+      availableDays,
+      gender: gender
     });
     
     console.log('Generated workout plan structure:', {

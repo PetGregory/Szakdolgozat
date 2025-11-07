@@ -55,7 +55,7 @@ function getSetsAndReps(fitnessLevel, exerciseType) {
 }
 
 async function generateWorkoutPlan(userData) {
-  const { goal, fitnessLevel, availableDays } = userData;
+  const { goal, fitnessLevel, availableDays, age, weight, height, gender } = userData;
 
   let data;
   try {

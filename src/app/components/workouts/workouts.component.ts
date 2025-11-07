@@ -159,6 +159,37 @@ export class WorkoutsComponent implements OnInit {
     }
   }
 
+  calculateCalorieTarget(): number {
+    const age = this.userData.age || 25;
+    const weight = this.userData.weight || 70;
+    const height = this.userData.height || 175;
+    const gender = this.userData.gender || 'male';
+    const availableDays = this.userData.availableDays || 0;
+
+    let bmr: number;
+    
+    if (gender === 'female') {
+      bmr = 655.1 + (9.563 * weight) + (1.850 * height) - (4.676 * age);
+    } else {
+      bmr = 66.47 + (13.75 * weight) + (5.003 * height) - (6.755 * age);
+    }
+
+    let activityMultiplier: number;
+    if (availableDays === 0) {
+      activityMultiplier = 1.2;
+    } else if (availableDays === 1 || availableDays === 2) {
+      activityMultiplier = 1.375;
+    } else if (availableDays === 3) {
+      activityMultiplier = 1.55;
+    } else if (availableDays === 4 || availableDays === 5) {
+      activityMultiplier = 1.725;
+    } else {
+      activityMultiplier = 1.9;
+    }
+
+    return Math.round(bmr * activityMultiplier);
+  }
+
   async generateWorkout(event?: Event) {
     if (event) {
       event.preventDefault();
@@ -195,13 +226,15 @@ export class WorkoutsComponent implements OnInit {
       
       if (response && response.workoutPlan) {
         this.generatedPlan = response.workoutPlan;
+        this.generatedPlan.calorieTarget = this.calculateCalorieTarget();
         console.log('✅ Generated plan assigned:', this.generatedPlan);
         console.log('📊 Plan details:', {
           daysCount: this.generatedPlan.days?.length,
           goal: this.generatedPlan.goal,
           fitnessLevel: this.generatedPlan.fitnessLevel,
           totalDays: this.generatedPlan.totalDays,
-          restDays: this.generatedPlan.restDays
+          restDays: this.generatedPlan.restDays,
+          calorieTarget: this.generatedPlan.calorieTarget
         });
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -246,18 +279,24 @@ export class WorkoutsComponent implements OnInit {
     }
 
     try {
+      const userDataToSave: any = {
+        gender: this.userData.gender,
+        age: this.userData.age,
+        weight: this.userData.weight,
+        height: this.userData.height,
+        goal: this.userData.goal,
+        fitnessLevel: this.userData.fitnessLevel,
+        availableDays: this.userData.availableDays
+      };
+
+      if (this.generatedPlan.calorieTarget !== undefined && this.generatedPlan.calorieTarget !== null) {
+        userDataToSave.calorieTarget = this.generatedPlan.calorieTarget;
+      }
+
       await this.userService.saveWorkoutPlan(
         this.currentUser.uid,
         this.generatedPlan,
-        {
-          gender: this.userData.gender,
-          age: this.userData.age,
-          weight: this.userData.weight,
-          height: this.userData.height,
-          goal: this.userData.goal,
-          fitnessLevel: this.userData.fitnessLevel,
-          availableDays: this.userData.availableDays
-        }
+        userDataToSave
       );
 
       alert('Workout plan saved successfully!');
