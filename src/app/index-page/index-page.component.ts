@@ -5,11 +5,11 @@ import { WorkoutPlanComponent } from './workout-plan/workout-plan.component';
 import { ProgressComponent } from './progress/progress.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-
+import { CauntCaloriesComponent } from './caunt-calories/caunt-calories.component';
 
 @Component({
   selector: 'app-index-page',
-  imports: [CommonModule, WorkoutPlanComponent, ProgressComponent],
+  imports: [CommonModule, WorkoutPlanComponent, ProgressComponent, CauntCaloriesComponent],
   templateUrl: './index-page.component.html',
   styleUrl: './index-page.component.css'
 })
