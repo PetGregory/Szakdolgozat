@@ -41,6 +41,7 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   currentUser: any = null;
+  isAdmin = false;
 
   ngOnInit() {
     this.loading = true;
@@ -73,6 +74,7 @@ export class ProfileComponent implements OnInit {
       this.user = await this.userService.getUser(this.currentUser.uid);
     }
     this.profileImageUrl = this.user?.profileImageUrl || null;
+    this.isAdmin = this.user?.role === 'admin';
     
     this.loading = false;
     this.cdr.detectChanges();

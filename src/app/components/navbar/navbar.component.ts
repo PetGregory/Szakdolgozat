@@ -1,9 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { LucideAngularModule, User } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
 import { DarkModeService } from '../dark-mode-service';
 import { Router } from '@angular/router';
 import {AuthService} from '../../auth.service';
+import { UserService } from '../../services/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -13,12 +15,21 @@ import {AuthService} from '../../auth.service';
   templateUrl:'./navbar.component.html',
   styleUrl:'./navbar.component.css',
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   
   isMenuOpen = false;
   isLoggedIn = false;
   showProfileMenu = false;
-  constructor(public darkModeService: DarkModeService, private router : Router, private authService: AuthService) {}
+  isAdmin = false;
+  private authSubscription?: Subscription;
+  
+  constructor(
+    public darkModeService: DarkModeService, 
+    private router : Router, 
+    private authService: AuthService,
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   currentUser$!: any;
   
@@ -28,11 +39,31 @@ export class NavbarComponent {
   }
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-
+    this.authSubscription = this.authService.currentUser$.subscribe(async (user) => {
       this.currentUser$ = this.authService.currentUser$;
       this.isLoggedIn = !!user;
+      
+      if (user) {
+        try {
+          const userData = await this.userService.getUser(user.uid);
+          this.isAdmin = userData?.role === 'admin';
+          console.log('User data:', userData, 'Is admin:', this.isAdmin);
+        } catch (error) {
+          console.error('Error loading user data:', error);
+          this.isAdmin = false;
+        }
+      } else {
+        this.isAdmin = false;
+      }
+      
+      this.cdr.detectChanges();
     });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   goToLogin() {
@@ -76,6 +107,10 @@ goToProfile() {
 }
 goToStats() {
   this.router.navigate(['/stats']);
+}
+goToAdmin() {
+  this.isMenuOpen = false;
+  this.router.navigate(['/admin']);
 }
 toggleProfileMenu() {
   this.showProfileMenu = !this.showProfileMenu;

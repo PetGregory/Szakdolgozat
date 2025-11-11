@@ -161,7 +161,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.username.trim()
         );
         
-        // Várunk egy kicsit, hogy biztosan mentve legyen
         await new Promise(resolve => setTimeout(resolve, 500));
         
         window.location.href = '/home';

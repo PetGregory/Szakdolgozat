@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc, query, where } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { FoodEntry } from './nutrition.service';
 
@@ -7,6 +7,7 @@ export interface UserData {
   id?: string;
   email: string;
   username: string;
+  role?: 'user' | 'admin';
   gender?: string | null;
   age: number | null;
   weight: number | null;
@@ -35,6 +36,7 @@ export class UserService {
       const userData: UserData = {
         email,
         username,
+        role: 'user',
         age: null,
         weight: null,
         height: null,
@@ -69,6 +71,7 @@ export class UserService {
       };
 
       if (!existingUser) {
+        userData.role = 'user';
         userData.age = null;
         userData.weight = null;
         userData.height = null;
@@ -210,5 +213,70 @@ export class UserService {
       return 0;
     }
     return user.dailyCalorieIntake[date].reduce((total, entry) => total + entry.calories, 0);
+  }
+
+  async isAdmin(userId: string): Promise<boolean> {
+    const user = await this.getUser(userId);
+    return user?.role === 'admin';
+  }
+
+  async getAllUsers(): Promise<UserData[]> {
+    try {
+      const usersRef = collection(this.firestore, 'users');
+      const querySnapshot = await getDocs(usersRef);
+      
+      const users: UserData[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const userData = docSnap.data();
+        users.push({
+          id: docSnap.id,
+          ...userData
+        } as UserData);
+      });
+      
+      return users;
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      throw error;
+    }
+  }
+
+  async searchUsers(searchTerm: string): Promise<UserData[]> {
+    try {
+      const usersRef = collection(this.firestore, 'users');
+      const querySnapshot = await getDocs(usersRef);
+      
+      const users: UserData[] = [];
+      const lowerSearchTerm = searchTerm.toLowerCase().trim();
+      
+      querySnapshot.forEach((docSnap) => {
+        const userData = docSnap.data();
+        const user: UserData = {
+          id: docSnap.id,
+          ...userData
+        } as UserData;
+
+        if (user.username?.toLowerCase().includes(lowerSearchTerm) ||
+            docSnap.id.toLowerCase().includes(lowerSearchTerm) ||
+            user.email?.toLowerCase().includes(lowerSearchTerm)) {
+          users.push(user);
+        }
+      });
+      
+      return users;
+    } catch (error) {
+      console.error('Error searching users:', error);
+      throw error;
+    }
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      await deleteDoc(userRef);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
   }
 }

@@ -1,0 +1,202 @@
+<div class="min-h-screen" >
+    <div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2" [ngClass]="{ 'text-white': darkModeService.darkMode(), 'text-gray-900': !darkModeService.darkMode() }">
+        Admin Panel
+      </h1>
+    </div>
+
+    <div class="flex space-x-4 mb-6 border-b" [ngClass]="{ 'border-gray-700': darkModeService.darkMode(), 'border-gray-200': !darkModeService.darkMode() }">
+      <button
+        (click)="switchTab('users')"
+        class="px-4 py-2 font-semibold transition-colors border-b-2"
+        [ngClass]="{
+          'border-blue-500 text-blue-500': activeTab === 'users' && !darkModeService.darkMode(),
+          'border-blue-400 text-blue-400': activeTab === 'users' && darkModeService.darkMode(),
+          'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'users' && !darkModeService.darkMode(),
+          'border-transparent text-gray-400 hover:text-gray-300': activeTab !== 'users' && darkModeService.darkMode()
+        }">
+        <lucide-icon [name]="UsersIcon" class="inline-block w-4 h-4 mr-2"></lucide-icon>
+        Users
+      </button>
+      <button
+        (click)="switchTab('forum')"
+        class="px-4 py-2 font-semibold transition-colors border-b-2"
+        [ngClass]="{
+          'border-blue-500 text-blue-500': activeTab === 'forum' && !darkModeService.darkMode(),
+          'border-blue-400 text-blue-400': activeTab === 'forum' && darkModeService.darkMode(),
+          'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'forum' && !darkModeService.darkMode(),
+          'border-transparent text-gray-400 hover:text-gray-300': activeTab !== 'forum' && darkModeService.darkMode()
+        }">
+        <lucide-icon [name]="MessageSquareIcon" class="inline-block w-4 h-4 mr-2"></lucide-icon>
+        Forum
+      </button>
+    </div>
+
+    <div *ngIf="activeTab === 'users'" class="space-y-6">
+      <div class="relative">
+        <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" 
+          [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-500': !darkModeService.darkMode() }"></lucide-icon>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder=" Search by username, email, or user ID..."
+          class="w-full pl-10 pr-4 py-2 rounded-lg border"
+          [ngClass]="{
+            'bg-gray-800 border-gray-700 text-white placeholder-gray-400': darkModeService.darkMode(),
+            'bg-white border-gray-300 text-gray-900 placeholder-gray-500': !darkModeService.darkMode()
+          }">
+      </div>
+
+      <div *ngIf="loadingUsers" class="text-center py-8">
+        <p [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">Loading users...</p>
+      </div>
+
+      <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="text-center py-8">
+        <p [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">No users found</p>
+      </div>
+
+      <div *ngIf="!loadingUsers && filteredUsers.length > 0" class="space-y-4">
+        
+        <div *ngFor="let user of filteredUsers" 
+          class="p-4 rounded-lg border transition-colors"
+          [ngClass]="{
+            'bg-gray-800 border-gray-700': darkModeService.darkMode(),
+            'bg-white border-gray-200': !darkModeService.darkMode()
+          }">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="font-semibold mb-1" [ngClass]="{ 'text-white': darkModeService.darkMode(), 'text-gray-900': !darkModeService.darkMode() }">
+                {{ user.username || 'No username' }}
+              </h3>
+              <p class="text-sm mb-1" [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">
+                {{ user.email }}
+              </p>
+              <p class="text-xs" [ngClass]="{ 'text-gray-500': darkModeService.darkMode() || !darkModeService.darkMode() }">
+                ID: {{ user.id }}
+              </p>
+              <p class="text-xs mt-1" [ngClass]="{ 'text-gray-500': darkModeService.darkMode() || !darkModeService.darkMode() }">
+                Role: <span class="font-semibold" [ngClass]="{ 'text-blue-400': user.role === 'admin', 'text-gray-400': user.role !== 'admin' }">
+                  {{ user.role || 'user' }}
+                </span>
+              </p>
+            </div>
+            <button
+              *ngIf="user.role !== 'admin'"
+              (click)="deleteUser(user)"
+              class="px-3 py-1 rounded text-sm font-semibold transition-colors"
+              [ngClass]="{
+                'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode(),
+                'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode()
+              }">
+              <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+            <span *ngIf="user.role === 'admin'" class="text-xs px-2 py-1 rounded"
+              [ngClass]="{
+                'text-gray-400': darkModeService.darkMode(),
+                'text-gray-500': !darkModeService.darkMode()
+              }">
+              Protected
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'forum'" class="space-y-6">
+      <div class="relative">
+        <lucide-icon [name]="SearchIcon" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" 
+          [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-500': !darkModeService.darkMode() }"></lucide-icon>
+        <input
+          type="text"
+          [(ngModel)]="forumSearchTerm"
+          (input)="onForumSearchChange()"
+          placeholder=" Search by title, username, or post ID..."
+          class="w-full pl-10 pr-4 py-2 rounded-lg border outline-none"
+          [ngClass]="{
+            'bg-gray-800 border-gray-700 text-white placeholder-gray-400': darkModeService.darkMode(),
+            'bg-white border-gray-300 text-gray-900 placeholder-gray-500': !darkModeService.darkMode()
+          }">
+      </div>
+
+      <div *ngIf="loadingPosts" class="text-center py-8">
+        <p [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">Loading posts...</p>
+      </div>
+
+      <div *ngIf="!loadingPosts && posts.length === 0" class="text-center py-8">
+        <p [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">No posts found</p>
+      </div>
+
+      <div *ngIf="!loadingPosts && posts.length > 0" class="space-y-6">
+        <div *ngFor="let post of posts" 
+          class="p-6 rounded-lg border"
+          [ngClass]="{
+            'bg-gray-800 border-gray-700': darkModeService.darkMode(),
+            'bg-white border-gray-200': !darkModeService.darkMode()
+          }">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-white': darkModeService.darkMode(), 'text-gray-900': !darkModeService.darkMode() }">
+                {{ post.title }}
+              </h3>
+              <p class="mb-2" [ngClass]="{ 'text-gray-300': darkModeService.darkMode(), 'text-gray-700': !darkModeService.darkMode() }">
+                {{ post.description }}
+              </p>
+              <div class="flex items-center space-x-4 text-sm" [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">
+                <span>By: {{ post.authorName }}</span>
+                <span>•</span>
+                <span>{{ formatDate(post.createdAt) }}</span>
+                <span>•</span>
+                <span>{{ post.replyCount || 0 }} replies</span>
+              </div>
+            </div>
+            <button
+              (click)="deletePost(post)"
+              class="px-3 py-1 rounded text-sm font-semibold transition-colors ml-4"
+              [ngClass]="{
+                'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode(),
+                'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode()
+              }">
+              <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+
+          <div *ngIf="post.replies && post.replies.length > 0" class="mt-4 pl-6 border-l-2"
+            [ngClass]="{ 'border-gray-700': darkModeService.darkMode(), 'border-gray-300': !darkModeService.darkMode() }">
+            <div *ngFor="let reply of post.replies" class="mb-4 last:mb-0">
+              <div class="p-4 rounded-lg"
+                [ngClass]="{
+                  'bg-gray-750': darkModeService.darkMode(),
+                  'bg-gray-50': !darkModeService.darkMode()
+                }">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <p class="mb-2" [ngClass]="{ 'text-gray-300': darkModeService.darkMode(), 'text-gray-700': !darkModeService.darkMode() }">
+                      {{ reply.content }}
+                    </p>
+                    <div class="text-xs" [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-600': !darkModeService.darkMode() }">
+                      <span>By: {{ reply.authorName }}</span>
+                      <span class="ml-4">{{ formatDate(reply.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <button
+                    (click)="deleteReply(reply, post)"
+                    class="px-2 py-1 rounded text-xs font-semibold transition-colors ml-4"
+                    [ngClass]="{
+                      'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode(),
+                      'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode()
+                    }">
+                    <lucide-icon [name]="TrashIcon" class="w-3 h-3"></lucide-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

@@ -1,17 +1,21 @@
 <div class="min-h-screen">
   <div class="border-b" [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
     <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-       
-        <div class="">
-            <select class="px-4 py-3 rounded-lg border outline-none"
-                    [ngClass]="{ 
-                      'border-gray-300 bg-primary text-gray-800': !darkModeService.darkMode(),
-                      'border-gray-600 bg-gray-800 text-gray-200': darkModeService.darkMode()
-                    }">
-              <option>Newest Posts</option>
-            </select>
-          </div>
+      <div class="flex items-center gap-3 flex-1">
+        <div class="relative flex-1 max-w-md">
+          <lucide-angular [name]="SearchIcon" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+            [ngClass]="{ 'text-gray-400': darkModeService.darkMode(), 'text-gray-500': !darkModeService.darkMode() }"></lucide-angular>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            [placeholder]="isAdmin ? ' Search by title, username, or post ID...' : ' Search by title or username...'"
+            class="w-full pl-10 pr-4 py-2 rounded-lg border outline-none"
+            [ngClass]="{
+              'bg-gray-800 border-gray-700 text-white placeholder-gray-400': darkModeService.darkMode(),
+              'bg-white border-gray-300 text-gray-900 placeholder-gray-500': !darkModeService.darkMode()
+            }">
+        </div>
       </div>
       <div class="flex items-center gap-3">
         <button 
@@ -93,11 +97,24 @@
       <div *ngFor="let post of posts" 
            class="border-b py-6"
            [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
-       <div class="flex items-center gap-2">
-        <h1 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{post.authorName}}: </h1>
-        <h2 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">
-            {{ post.title }}
-          </h2>
+       <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{post.authorName}}: </h1>
+          <h2 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">
+              {{ post.title }}
+            </h2>
+        </div>
+        <button
+          *ngIf="isAdmin"
+          (click)="deletePost(post)"
+          class="px-2 py-1 rounded text-sm font-semibold transition-colors"
+          [ngClass]="{
+            'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode(),
+            'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode()
+          }"
+          title="Delete post">
+          <lucide-angular [name]="TrashIcon" class="w-4 h-4"></lucide-angular>
+        </button>
        </div>
         <p class="text-sm mb-3" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
           {{ formatDate(post.createdAt) }}
@@ -157,7 +174,6 @@
           </button>
         </div>
 
-        <!-- Reply Form -->
         <div *ngIf="replyingTo === post.id" class="mt-4 p-4 rounded-lg"
              [ngClass]="{ 'bg-gray-50': !darkModeService.darkMode(), 'bg-gray-800': darkModeService.darkMode() }">
           <textarea 
@@ -174,8 +190,8 @@
               (click)="addReply(post.id!)" 
               class="px-4 py-2 rounded-lg font-semibold transition-colors"
               [ngClass]="{ 
-                'bg-green-500 text-white hover:bg-green-600': !darkModeService.darkMode(),
-                'bg-green-600 text-white hover:bg-green-700': darkModeService.darkMode()
+                'bg-black text-primary hover:bg-gray-800': !darkModeService.darkMode(),
+                'bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
               }">
               Reply
             </button>
@@ -191,21 +207,34 @@
           </div>
         </div>
 
-        <!-- Replies Section - Only show when expanded -->
         <div *ngIf="isExpanded(post.id!) && post.replies && post.replies.length > 0" class="mt-6 space-y-4 pl-6 border-l-2"
              [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
           <div *ngFor="let reply of post.replies" class="pt-4">
-            <h1 class="text-lg font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{ reply.authorName }}</h1>
-            <p class="text-sm mb-1" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
-              {{ formatDate(reply.createdAt) }}
-            </p>
-            <p class="leading-relaxed" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">
-              {{ reply.content }}
-            </p>
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1">
+                <h1 class="text-lg font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{ reply.authorName }}</h1>
+                <p class="text-sm mb-1" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+                  {{ formatDate(reply.createdAt) }}
+                </p>
+                <p class="leading-relaxed" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">
+                  {{ reply.content }}
+                </p>
+              </div>
+              <button
+                *ngIf="isAdmin"
+                (click)="deleteReply(reply, post)"
+                class="px-2 py-1 rounded text-xs font-semibold transition-colors flex-shrink-0"
+                [ngClass]="{
+                  'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode(),
+                  'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode()
+                }"
+                title="Delete reply">
+                <lucide-angular [name]="TrashIcon" class="w-3 h-3"></lucide-angular>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Show message if no replies but expanded -->
         <div *ngIf="isExpanded(post.id!) && (!post.replies || post.replies.length === 0)" class="mt-6 pl-6">
           <p class="text-sm italic" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
             No replies yet. Be the first to reply!

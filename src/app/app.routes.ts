@@ -15,5 +15,6 @@ export const routes: Routes = [
     { path: 'profile', loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent) },
     { path: 'nutrition', loadComponent: () => import('./components/nutrition/nutrition.component').then(m => m.NutritionComponent) },
     { path: 'forum', loadComponent: () => import('./components/forum/forum.component').then(m => m.ForumComponent) },
+    { path: 'admin', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

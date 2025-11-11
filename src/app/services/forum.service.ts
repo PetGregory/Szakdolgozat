@@ -222,5 +222,55 @@ export class ForumService {
     
     return null;
   }
+
+  async deletePost(postId: string): Promise<void> {
+    try {
+      const repliesRef = collection(this.firestore, 'forumReplies');
+      const repliesQuery = query(repliesRef, where('postId', '==', postId));
+      const repliesSnapshot = await getDocs(repliesQuery);
+      
+      const deletePromises: Promise<void>[] = [];
+      repliesSnapshot.forEach((replyDoc) => {
+        deletePromises.push(deleteDoc(doc(this.firestore, 'forumReplies', replyDoc.id)));
+      });
+
+      const likesRef = collection(this.firestore, 'forumLikes');
+      const likesSnapshot = await getDocs(likesRef);
+      
+      likesSnapshot.forEach((likeDoc) => {
+        const likeData = likeDoc.data() as PostLike;
+        if (likeData.postId === postId) {
+          deletePromises.push(deleteDoc(doc(this.firestore, 'forumLikes', likeDoc.id)));
+        }
+      });
+      
+      await Promise.all(deletePromises);
+
+      const postRef = doc(this.firestore, 'forumPosts', postId);
+      await deleteDoc(postRef);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      throw error;
+    }
+  }
+
+  async deleteReply(replyId: string, postId: string): Promise<void> {
+    try {
+      const replyRef = doc(this.firestore, 'forumReplies', replyId);
+      await deleteDoc(replyRef);
+      const postRef = doc(this.firestore, 'forumPosts', postId);
+      const postSnap = await getDoc(postRef);
+      if (postSnap.exists()) {
+        const postData = postSnap.data() as ForumPost;
+        const newReplyCount = Math.max(0, (postData.replyCount || 0) - 1);
+        await updateDoc(postRef, {
+          replyCount: newReplyCount
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+      throw error;
+    }
+  }
 }
 

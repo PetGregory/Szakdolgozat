@@ -41,7 +41,7 @@
 
     <div class="hidden xl:flex gap-12 items-center ml-8 text-2xl pl-10">
       <button
-      *ngIf="isLoggedIn"
+      *ngIf="isLoggedIn && !isAdmin"
         (click)="goToWorkouts()"
         [ngClass]="{
           'text-gray-500 hover:text-black': !darkModeService.darkMode(),
@@ -49,7 +49,7 @@
         }"
         >Workouts</button>
       <button
-        *ngIf="isLoggedIn"
+        *ngIf="isLoggedIn && !isAdmin"
         (click)="goToNutrition()"
         [ngClass]="{
           'text-gray-500 hover:text-black': !darkModeService.darkMode(),
@@ -65,6 +65,15 @@
           'text-primary hover:text-accent1': darkModeService.darkMode()
         }"
         >Forum</button
+      >
+      <button
+        *ngIf="isAdmin"
+        (click)="goToAdmin()"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+        >Admin</button
       >
     </div>
 
@@ -115,6 +124,7 @@
             </button>
       
             <button
+              *ngIf="!isAdmin"
               (click)="goToStats()"
               class="block w-full text-left px-4 py-2"
               [ngClass]="{
@@ -123,6 +133,18 @@
               }"
             >
               Statistics
+            </button>
+      
+            <button
+              *ngIf="isAdmin"
+              (click)="goToAdmin()"
+              class="block w-full text-left px-4 py-2"
+              [ngClass]="{
+                'hover:text-black': !darkModeService.darkMode(),
+                'hover:text-accent1': darkModeService.darkMode()
+              }"
+            >
+              Admin Panel
             </button>
       
             <button
@@ -158,7 +180,7 @@
     }"
     style="top: 6rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);"
   >
-  <button *ngIf="isLoggedIn" (click)="goToWorkouts(); closeMenu()" style="width: 90%; margin: 0 auto;"
+  <button *ngIf="isLoggedIn && !isAdmin" (click)="goToWorkouts(); closeMenu()" style="width: 90%; margin: 0 auto;"
     [ngClass]="{
       'hover:text-accent1': darkModeService.darkMode(),
       'hover:text-black': !darkModeService.darkMode
@@ -170,7 +192,7 @@
     </div>
   </button>
 
-  <button *ngIf="isLoggedIn" (click)="goToNutrition(); closeMenu()" style="width: 90%; margin: 0 auto;"
+  <button *ngIf="isLoggedIn && !isAdmin" (click)="goToNutrition(); closeMenu()" style="width: 90%; margin: 0 auto;"
     [ngClass]="{
       'hover:text-accent1': darkModeService.darkMode(),
       'hover:text-black': !darkModeService.darkMode
@@ -188,6 +210,17 @@
     }">
     <div class="flex justify-between items-center w-full text-2xl py-3">
       <p>Forum</p>
+      <span>></span>
+    </div>
+  </button>
+
+  <button *ngIf="isAdmin" (click)="goToAdmin(); closeMenu()" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full text-2xl py-3">
+      <p>Admin Panel</p>
       <span>></span>
     </div>
   </button>
