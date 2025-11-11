@@ -53,6 +53,11 @@ export class NavbarComponent {
     this.router.navigate(['/nutrition']);
   }
 
+  goToForum() {
+    this.isMenuOpen = false;
+    this.router.navigate(['/forum']);
+  }
+
   closeMenu() {
     this.isMenuOpen = false;
   }

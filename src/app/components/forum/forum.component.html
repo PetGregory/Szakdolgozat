@@ -1,0 +1,224 @@
+<div class="min-h-screen">
+  <div class="border-b" [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+       
+        <div class="">
+            <select class="px-4 py-3 rounded-lg border outline-none"
+                    [ngClass]="{ 
+                      'border-gray-300 bg-primary text-gray-800': !darkModeService.darkMode(),
+                      'border-gray-600 bg-gray-800 text-gray-200': darkModeService.darkMode()
+                    }">
+              <option>Newest Posts</option>
+            </select>
+          </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button 
+          (click)="togglePostForm()" 
+          class="px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
+          [ngClass]="{ 
+            'bg-black text-gray-900 hover:bg-gray-800': !darkModeService.darkMode(),
+            'bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+          }">
+          <lucide-angular [name]="PencilIcon" class="w-4 h-4 text-white" />
+          <span class="text-white">Post</span>
+        </button>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 py-6">
+    <div *ngIf="showPostForm" class="mb-6 p-6 rounded-lg border"
+         [ngClass]="{ 
+           'bg-white border-gray-200': !darkModeService.darkMode(),
+           'bg-gray-800 border-gray-700': darkModeService.darkMode()
+         }">
+      <h3 class="text-lg font-semibold mb-4" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">
+        Create New Post
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <input 
+            type="text" 
+            [(ngModel)]="postTitle" 
+            placeholder="Post title..."
+            class="w-full px-4 py-2 rounded-lg border outline-none"
+            [ngClass]="{ 
+              'border-gray-300 bg-white text-gray-800': !darkModeService.darkMode(),
+              'border-gray-600 bg-gray-700 text-gray-200': darkModeService.darkMode()
+            }">
+        </div>
+        <div>
+          <textarea 
+            [(ngModel)]="postDescription" 
+            placeholder="Post description..."
+            rows="4"
+            class="w-full px-4 py-2 rounded-lg border outline-none resize-none"
+            [ngClass]="{ 
+              'border-gray-300 bg-white text-gray-800': !darkModeService.darkMode(),
+              'border-gray-600 bg-gray-700 text-gray-200': darkModeService.darkMode()
+            }"></textarea>
+        </div>
+        <div class="flex gap-2">
+          <button 
+            (click)="createPost()"
+            class="px-6 py-2 rounded-lg font-semibold transition-colors"
+            [ngClass]="{ 
+              'bg-black text-primary hover:bg-gray-800': !darkModeService.darkMode(),
+              'bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+            }">
+            Post
+          </button>
+          <button 
+            (click)="togglePostForm()" 
+            class="px-6 py-2 rounded-lg font-semibold transition-colors"
+            [ngClass]="{ 
+              'bg-gray-200 text-gray-800 hover:bg-gray-300': !darkModeService.darkMode(),
+              'bg-gray-700 text-gray-200 hover:bg-gray-600': darkModeService.darkMode()
+            }">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="loading" class="text-center py-12">
+      <p [ngClass]="{ 'text-gray-600': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+        Loading posts...
+      </p>
+    </div>
+
+    <div *ngIf="!loading" class="space-y-0">
+      <div *ngFor="let post of posts" 
+           class="border-b py-6"
+           [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
+       <div class="flex items-center gap-2">
+        <h1 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{post.authorName}}: </h1>
+        <h2 class="text-xl font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">
+            {{ post.title }}
+          </h2>
+       </div>
+        <p class="text-sm mb-3" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+          {{ formatDate(post.createdAt) }}
+        </p>
+
+        <p class="mb-4 leading-relaxed" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">
+          {{ post.description }}
+        </p>
+
+        <div class="flex items-center gap-6">
+          <button 
+            (click)="toggleLike(post.id!, 'like')"
+            class="flex items-center gap-2 transition-colors"
+            [ngClass]="{ 
+              'text-green-600': isLiked(post.id!),
+              'text-gray-500 hover:text-green-600': !isLiked(post.id!) && !darkModeService.darkMode(),
+              'text-gray-400 hover:text-green-500': !isLiked(post.id!) && darkModeService.darkMode()
+            }">
+            <lucide-angular [name]="ThumbsUpIcon" class="w-5 h-5" />
+            <span class="font-medium">{{ post.likes || 0 }}</span>
+          </button>
+          
+          <button 
+            (click)="toggleLike(post.id!, 'dislike')"
+            class="flex items-center gap-2 transition-colors"
+            [ngClass]="{ 
+              'text-red-600': isDisliked(post.id!),
+              'text-gray-500 hover:text-red-600': !isDisliked(post.id!) && !darkModeService.darkMode(),
+              'text-gray-400 hover:text-red-500': !isDisliked(post.id!) && darkModeService.darkMode()
+            }">
+            <lucide-angular [name]="ThumbsDownIcon" class="w-5 h-5" />
+            <span class="font-medium">{{ post.dislikes || 0 }}</span>
+          </button>
+          
+          <button 
+            (click)="toggleComments(post.id!)"
+            class="flex items-center gap-2 transition-colors"
+            [ngClass]="{ 
+              'text-blue-600': isExpanded(post.id!),
+              'text-gray-500 hover:text-blue-600': !isExpanded(post.id!) && !darkModeService.darkMode(),
+              'text-gray-400 hover:text-blue-500': !isExpanded(post.id!) && darkModeService.darkMode()
+            }">
+            <lucide-angular [name]="MessageCircleIcon" class="w-5 h-5" />
+            <span class="font-medium">{{ post.replyCount || 0 }}</span>
+          </button>
+        </div>
+
+        <div *ngIf="isExpanded(post.id!) && replyingTo !== post.id" class="mt-4">
+          <button 
+            (click)="startReply(post.id!)"
+            class="px-4 py-2 rounded-lg font-semibold transition-colors"
+            [ngClass]="{ 
+              'bg-black text-primary hover:bg-gray-800': !darkModeService.darkMode(),
+              'bg-blue-400 text-white hover:scale-105': darkModeService.darkMode()
+            }">
+            Reply
+          </button>
+        </div>
+
+        <!-- Reply Form -->
+        <div *ngIf="replyingTo === post.id" class="mt-4 p-4 rounded-lg"
+             [ngClass]="{ 'bg-gray-50': !darkModeService.darkMode(), 'bg-gray-800': darkModeService.darkMode() }">
+          <textarea 
+            [(ngModel)]="replyContent" 
+            placeholder="Write a reply..."
+            rows="3"
+            class="w-full px-4 py-2 rounded-lg border outline-none resize-none mb-3"
+            [ngClass]="{ 
+              'border-gray-300 bg-white text-gray-800': !darkModeService.darkMode(),
+              'border-gray-600 bg-gray-700 text-gray-200': darkModeService.darkMode()
+            }"></textarea>
+          <div class="flex gap-2">
+            <button 
+              (click)="addReply(post.id!)" 
+              class="px-4 py-2 rounded-lg font-semibold transition-colors"
+              [ngClass]="{ 
+                'bg-green-500 text-white hover:bg-green-600': !darkModeService.darkMode(),
+                'bg-green-600 text-white hover:bg-green-700': darkModeService.darkMode()
+              }">
+              Reply
+            </button>
+            <button 
+              (click)="cancelReply()" 
+              class="px-4 py-2 rounded-lg font-semibold transition-colors"
+              [ngClass]="{ 
+                'bg-gray-200 text-gray-800 hover:bg-gray-300': !darkModeService.darkMode(),
+                'bg-gray-700 text-gray-200 hover:bg-gray-600': darkModeService.darkMode()
+              }">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Replies Section - Only show when expanded -->
+        <div *ngIf="isExpanded(post.id!) && post.replies && post.replies.length > 0" class="mt-6 space-y-4 pl-6 border-l-2"
+             [ngClass]="{ 'border-gray-200': !darkModeService.darkMode(), 'border-gray-700': darkModeService.darkMode() }">
+          <div *ngFor="let reply of post.replies" class="pt-4">
+            <h1 class="text-lg font-semibold mb-2" [ngClass]="{ 'text-gray-800': !darkModeService.darkMode(), 'text-gray-200': darkModeService.darkMode() }">{{ reply.authorName }}</h1>
+            <p class="text-sm mb-1" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+              {{ formatDate(reply.createdAt) }}
+            </p>
+            <p class="leading-relaxed" [ngClass]="{ 'text-gray-700': !darkModeService.darkMode(), 'text-gray-300': darkModeService.darkMode() }">
+              {{ reply.content }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Show message if no replies but expanded -->
+        <div *ngIf="isExpanded(post.id!) && (!post.replies || post.replies.length === 0)" class="mt-6 pl-6">
+          <p class="text-sm italic" [ngClass]="{ 'text-gray-500': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+            No replies yet. Be the first to reply!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && posts.length === 0" class="text-center py-12">
+      <p [ngClass]="{ 'text-gray-600': !darkModeService.darkMode(), 'text-gray-400': darkModeService.darkMode() }">
+        No posts yet. Be the first to post!
+      </p>
+    </div>
+  </div>
+</div>
+

@@ -40,39 +40,42 @@ export class ProfileComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  currentUser: any = null;
+
   ngOnInit() {
     this.loading = true;
-    this.authService.currentUser$.subscribe({
-      next: async (firebaseUser) => {
-        if (!firebaseUser) {
-          this.router.navigate(['/login']);
-          return;
-        }
-        const uid = firebaseUser.uid;
-        this.user = await this.userService.getUser(uid);
-
-        if (!this.user && firebaseUser) {
-          const email = firebaseUser.email || '';
-          const displayName = firebaseUser.displayName || '';
-          const username = displayName || (email ? email.split('@')[0] : '');
-          
-          await this.userService.createOrUpdateGoogleUser(uid, email, username);
-          this.user = await this.userService.getUser(uid);
-        }
-        
-        if (this.user && (!this.user.profileImageUrl || this.user.profileImageUrl === null)) {
-          await this.userService.setAvatarColor(uid, 0);
-          this.user = await this.userService.getUser(uid);
-        }
-        this.profileImageUrl = this.user?.profileImageUrl || null;
-        
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loading = false;
+    this.authService.currentUser$.subscribe(async (firebaseUser) => {
+      this.currentUser = firebaseUser;
+      if (!firebaseUser) {
+        this.router.navigate(['/login']);
+        return;
       }
+      await this.loadUserData();
     });
+  }
+
+  async loadUserData() {
+    if (!this.currentUser) return;
+    
+    this.user = await this.userService.getUser(this.currentUser.uid);
+
+    if (!this.user) {
+      const email = this.currentUser.email || '';
+      const displayName = this.currentUser.displayName || '';
+      const username = displayName || (email ? email.split('@')[0] : '');
+      
+      await this.userService.createOrUpdateGoogleUser(this.currentUser.uid, email, username);
+      this.user = await this.userService.getUser(this.currentUser.uid);
+    }
+    
+    if (this.user && (!this.user.profileImageUrl || this.user.profileImageUrl === null)) {
+      await this.userService.setAvatarColor(this.currentUser.uid, 0);
+      this.user = await this.userService.getUser(this.currentUser.uid);
+    }
+    this.profileImageUrl = this.user?.profileImageUrl || null;
+    
+    this.loading = false;
+    this.cdr.detectChanges();
   }
 
   toInt(value: string | null | undefined): number {

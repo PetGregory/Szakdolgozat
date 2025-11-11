@@ -57,14 +57,14 @@
         }"
         >Count the calories</button
       >
-      <a
-        href="#"
+      <button
         *ngIf="isLoggedIn"
+        (click)="goToForum()"
         [ngClass]="{
           'text-gray-500 hover:text-black': !darkModeService.darkMode(),
           'text-primary hover:text-accent1': darkModeService.darkMode()
         }"
-        >Forum</a
+        >Forum</button
       >
     </div>
 
@@ -181,7 +181,7 @@
     </div>
   </button>
 
-  <button *ngIf="isLoggedIn" (click)="closeMenu()" style="width: 90%; margin: 0 auto;"
+  <button *ngIf="isLoggedIn" (click)="goToForum(); closeMenu()" style="width: 90%; margin: 0 auto;"
     [ngClass]="{
       'hover:text-accent1': darkModeService.darkMode(),
       'hover:text-black': !darkModeService.darkMode
