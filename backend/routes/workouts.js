@@ -1,9 +1,14 @@
+
+
 const express = require('express');
+
 const router = express.Router();
+
 const { generateWorkoutPlan } = require('../services/workoutGenerator');
 
 router.post('/generate', async (req, res) => {
   try {
+
     const { userId, age, weight, height, goal, fitnessLevel, availableDays, gender } = req.body;
 
     if (!userId || !goal || !fitnessLevel || !availableDays) {
@@ -21,7 +26,7 @@ router.post('/generate', async (req, res) => {
       availableDays,
       gender: gender
     });
-    
+
     console.log('Generated workout plan structure:', {
       restDays: workoutPlan?.restDays,
       totalDays: workoutPlan?.totalDays,
@@ -30,9 +35,10 @@ router.post('/generate', async (req, res) => {
       hasRestDays: workoutPlan?.restDays !== undefined,
       hasTotalDays: workoutPlan?.totalDays !== undefined
     });
-    
+
     if (workoutPlan.days) {
       workoutPlan.days.forEach((day, index) => {
+
         if (day.isRestDay === undefined) {
           console.warn(`⚠️  Day ${index + 1} (${day.name}) missing isRestDay field, setting to false`);
           day.isRestDay = false;
@@ -47,8 +53,11 @@ router.post('/generate', async (req, res) => {
     });
 
   } catch (error) {
+
     console.error('Error generating workout:', error);
+
     const statusCode = error.message.includes('Invalid workout schedule') ? 400 : 500;
+
     res.status(statusCode).json({
       error: 'Failed to generate workout plan',
       details: error.message

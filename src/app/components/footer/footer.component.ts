@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { DarkModeService } from '../dark-mode-service';
-import { CommonModule } from '@angular/common';
 
+
+import { Component } from '@angular/core';
+
+import { DarkModeService } from '../dark-mode-service';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-footer',
@@ -9,6 +12,8 @@ import { CommonModule } from '@angular/common';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
+
 export class FooterComponent {
-constructor(public darkModeService: DarkModeService) {}
+
+  constructor(public darkModeService: DarkModeService) {}
 }

@@ -1,9 +1,17 @@
+
+
 import { Component, HostBinding } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import { RouterOutlet } from '@angular/router';
+
 import { DarkModeService } from './components/dark-mode-service';
+
 import { NavbarComponent } from './components/navbar/navbar.component';
+
 import { LightButtonComponent } from './dark/light-button/light-button.component';
+
 import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
@@ -19,10 +27,13 @@ import { FooterComponent } from './components/footer/footer.component';
   templateUrl: './app.component.html',
   styles: [``],
 })
+
 export class AppComponent {
+
   constructor(public darkModeService: DarkModeService) {}
 
   @HostBinding('class.dark') get mode() {
+
     return this.darkModeService.darkMode();
   }
 }

@@ -1,5 +1,9 @@
+
+
 import { initializeApp } from "firebase/app";
+
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+
 import fs from "fs";
 
 const firebaseConfig = {
@@ -12,16 +16,21 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
 const data = JSON.parse(fs.readFileSync("workoutData.json", "utf8"));
 
 async function uploadData() {
   try {
+
     console.log("Uploading exerciseData...");
+
     await setDoc(doc(db, "exerciseData", "default"), data);
+
     console.log("exerciseData uploaded successfully!");
   } catch (err) {
+
     console.error("Error uploading data:", err);
   }
 }

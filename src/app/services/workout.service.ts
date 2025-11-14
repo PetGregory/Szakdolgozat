@@ -1,6 +1,11 @@
+
+
 import { Injectable } from '@angular/core';
+
 import { HttpClient } from '@angular/common/http';
+
 import { Observable } from 'rxjs';
+
 import { environment } from '../../environments/environment';
 
 export interface UserWorkoutData {
@@ -52,16 +57,15 @@ export interface WorkoutResponse {
 @Injectable({
   providedIn: 'root'
 })
+
 export class WorkoutService {
+
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   generateWorkoutPlan(userData: UserWorkoutData): Observable<WorkoutResponse> {
-    return this.http.post<WorkoutResponse>(`${this.apiUrl}/workouts/generate`, userData);
-  }
 
-  getUserWorkouts(userId: string): Observable<{ workouts: any[] }> {
-    return this.http.get<{ workouts: any[] }>(`${this.apiUrl}/workouts/${userId}`);
+    return this.http.post<WorkoutResponse>(`${this.apiUrl}/workouts/generate`, userData);
   }
 }
