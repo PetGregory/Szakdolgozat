@@ -11,10 +11,10 @@
         
         <div class="relative calendar-container">
           <button (click)="calendarVisible = !calendarVisible; $event.stopPropagation()"
-            class="px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2"
+            class="px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 hover:scale-105"
             [ngClass]="{
-              'bg-blue-600 text-white hover:bg-blue-700': !darkModeService.darkMode(),
-              'bg-blue-500 text-white hover:bg-blue-600': darkModeService.darkMode()
+              'bg-black text-primary ': !darkModeService.darkMode(),
+              'bg-blue-400 text-gray-900 ': darkModeService.darkMode()
             }">
             <span>{{ selectedDate === today ? 'Today' : selectedDate }}</span>
             <lucide-angular [name]="CalendarIcon" class="w-4 h-4"></lucide-angular>
@@ -31,10 +31,10 @@
             <div class="flex justify-between items-center mb-4">
               <button (click)="previousMonth()" 
                 class="p-2 rounded hover:bg-gray-100"
-                [ngClass]="{'hover:bg-gray-700': darkModeService.darkMode()}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
+                [ngClass]="{'text-primary hover:bg-gray-700': darkModeService.darkMode(),
+                  
+                }">
+                <lucide-angular [name]="ChevronLeftIcon" class="w-5 h-5"></lucide-angular>
               </button>
               <button (click)="toggleMonthYearPicker()"
                 class="px-3 py-1 rounded hover:bg-gray-100 font-semibold"
@@ -46,14 +46,13 @@
               </button>
               <button (click)="nextMonth()"
                 class="p-2 rounded hover:bg-gray-100"
-                [ngClass]="{'hover:bg-gray-700': darkModeService.darkMode()}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
+                [ngClass]="{'text-primary hover:bg-gray-700': darkModeService.darkMode(),
+
+                }">
+                <lucide-angular [name]="ChevronRightIcon" class="w-5 h-5"></lucide-angular>
               </button>
             </div>
 
-            <!-- Month and Year Picker -->
             <div *ngIf="showMonthYearPicker" 
               class="mb-4 p-3 rounded-lg border"
               [ngClass]="{
@@ -173,7 +172,7 @@
                 [ngClass]="{
                   'text-gray-400 cursor-not-allowed opacity-50': !day.isCurrentMonth || isFutureDate(day.date),
                   'text-gray-900 hover:bg-gray-100': day.isCurrentMonth && !darkModeService.darkMode() && !isToday(day.date) && !isSelected(day.date) && !isFutureDate(day.date),
-                  'text-white hover:bg-gray-700': day.isCurrentMonth && darkModeService.darkMode() && !isToday(day.date) && !isSelected(day.date) && !isFutureDate(day.date),
+                  'text-primary hover:bg-gray-700': day.isCurrentMonth && darkModeService.darkMode() && !isToday(day.date) && !isSelected(day.date) && !isFutureDate(day.date),
                   'bg-blue-600 text-white font-bold': isToday(day.date) && !isSelected(day.date),
                   'bg-blue-500 text-white font-bold ring-2 ring-blue-300': isSelected(day.date),
                   'bg-blue-100 text-blue-700 font-bold': isToday(day.date) && !isSelected(day.date) && !darkModeService.darkMode()
@@ -271,12 +270,13 @@
    
            <button (click)="searchFood()"
              [disabled]="isLoading || !searchQuery.trim()"
-             class="px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50"
+             class="px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 hover:scale-105"
              [ngClass]="{
-               'bg-blue-600 text-white hover:bg-blue-700': !darkModeService.darkMode() && !isLoading,
-               'bg-blue-500 text-white hover:bg-blue-600': darkModeService.darkMode() && !isLoading
-             }">
-               <span *ngIf="!isLoading">Search</span>
+              'bg-black text-primary ': !darkModeService.darkMode(),
+              'bg-blue-400 text-gray-900 ': darkModeService.darkMode()
+            }">
+               <span *ngIf="!isLoading" 
+               >Search</span>
                <span *ngIf="isLoading">Searching...</span>
            </button>
          </div>

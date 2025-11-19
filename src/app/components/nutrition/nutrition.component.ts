@@ -7,7 +7,7 @@ import { UserService } from '../../services/user.service';
 import { DarkModeService } from '../dark-mode-service';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Calendar } from 'lucide-angular';
+import { LucideAngularModule, Calendar, ChevronLeft, ChevronRight } from 'lucide-angular';
 
 @Component({
   selector: 'app-nutrition',
@@ -43,6 +43,8 @@ export class NutritionComponent implements OnInit {
   showMonthYearPicker = false;
 
   CalendarIcon = Calendar;
+  ChevronLeftIcon = ChevronLeft;
+  ChevronRightIcon = ChevronRight;
 
 
   constructor(
