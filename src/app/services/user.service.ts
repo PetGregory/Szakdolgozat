@@ -47,7 +47,7 @@ export class UserService {
         profileImageUrl: '0',
         createdAt: new Date().toISOString()
       };
-
+      
       await setDoc(userRef, userData);
     } catch (error) {
       console.error('Error creating user document:', error);
@@ -59,12 +59,12 @@ export class UserService {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
       const existingUser = await this.getUser(userId);
-
+      
       let finalUsername = username || '';
       if (!finalUsername && email) {
         finalUsername = email.split('@')[0];
       }
-
+      
       const userData: Partial<UserData> = {
         email,
         username: finalUsername
@@ -84,7 +84,7 @@ export class UserService {
       } else {
         userData.updatedAt = new Date().toISOString();
       }
-
+      
       await setDoc(userRef, userData, { merge: true });
     } catch (error) {
       console.error('Error creating/updating Google user document:', error);
@@ -96,7 +96,7 @@ export class UserService {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
       const userSnap = await getDoc(userRef);
-
+      
       if (userSnap.exists()) {
         return { id: userSnap.id, ...userSnap.data() } as UserData;
       }
@@ -122,15 +122,15 @@ export class UserService {
   }
 
   async saveWorkoutPlan(
-    userId: string,
-    workoutPlan: any,
+    userId: string, 
+    workoutPlan: any, 
     userData?: Partial<UserData>
   ): Promise<void> {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
 
       const userSnap = await getDoc(userRef);
-
+      
       const updateData: any = {
         workout: workoutPlan,
         workoutUpdatedAt: new Date().toISOString(),
@@ -155,7 +155,6 @@ export class UserService {
 
         await setDoc(userRef, defaultUserData, { merge: true });
       } else {
-
         await updateDoc(userRef, updateData);
       }
     } catch (error) {
@@ -172,7 +171,7 @@ export class UserService {
   async setAvatarColor(userId: string, colorIndex: number): Promise<void> {
     await this.updateUser(userId, { profileImageUrl: colorIndex.toString() } as Partial<UserData>);
   }
-
+  
   getUser$(userId: string): Observable<UserData | null> {
     return from(this.getUser(userId));
   }
@@ -181,19 +180,19 @@ export class UserService {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
       const user = await this.getUser(userId);
-
+      
       if (!user) {
         throw new Error('User not found');
       }
 
-      const today = new Date().toISOString().split('T')[0];
+      const entryDate = foodEntry.date || new Date().toISOString().split('T')[0];
       const dailyIntake = user.dailyCalorieIntake || {};
 
-      if (!dailyIntake[today]) {
-        dailyIntake[today] = [];
+      if (!dailyIntake[entryDate]) {
+        dailyIntake[entryDate] = [];
       }
 
-      dailyIntake[today].push(foodEntry);
+      dailyIntake[entryDate].push(foodEntry);
 
       await updateDoc(userRef, {
         dailyCalorieIntake: dailyIntake,
@@ -209,7 +208,7 @@ export class UserService {
     try {
       const userRef = doc(this.firestore, `users/${userId}`);
       const user = await this.getUser(userId);
-
+      
       if (!user?.dailyCalorieIntake?.[date]) {
         return;
       }
@@ -243,7 +242,7 @@ export class UserService {
     try {
       const usersRef = collection(this.firestore, 'users');
       const querySnapshot = await getDocs(usersRef);
-
+      
       const users: UserData[] = [];
       querySnapshot.forEach((docSnap) => {
         const userData = docSnap.data();
@@ -252,7 +251,7 @@ export class UserService {
           ...userData
         } as UserData);
       });
-
+      
       return users;
     } catch (error) {
       console.error('Error getting all users:', error);
@@ -264,10 +263,10 @@ export class UserService {
     try {
       const usersRef = collection(this.firestore, 'users');
       const querySnapshot = await getDocs(usersRef);
-
+      
       const users: UserData[] = [];
       const lowerSearchTerm = searchTerm.toLowerCase().trim();
-
+      
       querySnapshot.forEach((docSnap) => {
         const userData = docSnap.data();
         const user: UserData = {
@@ -281,7 +280,7 @@ export class UserService {
           users.push(user);
         }
       });
-
+      
       return users;
     } catch (error) {
       console.error('Error searching users:', error);
