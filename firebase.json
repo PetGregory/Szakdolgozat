@@ -1,4 +1,7 @@
 {
+  "firestore": {
+    "rules": ".firestoreRules"
+  },
   "hosting": {
     "public": "dist/be-strong/browser",
     "ignore": [

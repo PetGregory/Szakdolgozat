@@ -58,6 +58,15 @@
         >Count the calories</button
       >
       <button
+        *ngIf="isLoggedIn && !isAdmin"
+        (click)="goToWorkoutTracker()"
+        [ngClass]="{
+          'text-gray-500 hover:text-black': !darkModeService.darkMode(),
+          'text-primary hover:text-accent1': darkModeService.darkMode()
+        }"
+        >Workout Tracker</button
+      >
+      <button
         *ngIf="isLoggedIn"
         (click)="goToForum()"
         [ngClass]="{
@@ -199,6 +208,17 @@
     }">
     <div class="flex justify-between items-center w-full text-2xl py-3">
       <p>Count the calories</p>
+      <span>></span>
+    </div>
+  </button>
+
+  <button *ngIf="isLoggedIn && !isAdmin" (click)="goToWorkoutTracker(); closeMenu()" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full text-2xl py-3">
+      <p>Workout Tracker</p>
       <span>></span>
     </div>
   </button>

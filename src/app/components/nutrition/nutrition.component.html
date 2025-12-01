@@ -32,7 +32,7 @@
               <button (click)="previousMonth()" 
                 class="p-2 rounded hover:bg-gray-100"
                 [ngClass]="{'text-primary hover:bg-gray-700': darkModeService.darkMode(),
-                  
+                
                 }">
                 <lucide-angular [name]="ChevronLeftIcon" class="w-5 h-5"></lucide-angular>
               </button>
@@ -402,10 +402,10 @@
                </div>
    
                <button (click)="removeFoodEntry(entry.id)"
-                 class="ml-4 px-4 py-2 rounded-lg font-semibold transition-colors"
+                 class="ml-4 px-4 py-2 rounded-lg font-semibold transition-colors hover:scale-105 "
                  [ngClass]="{
-                   'bg-red-500 text-white hover:bg-red-600': !darkModeService.darkMode(),
-                   'bg-red-600 text-white hover:bg-red-700': darkModeService.darkMode()
+                   'bg-red-200 text-red-700 hover:bg-red-300': !darkModeService.darkMode(),
+                   'bg-red-900 text-bg-gray-300': darkModeService.darkMode()
                  }">Remove</button>
            </div>
          </div>

@@ -3,6 +3,23 @@ import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteD
 import { Observable, from } from 'rxjs';
 import { FoodEntry } from './nutrition.service';
 
+export interface WorkoutSet {
+  id: string;
+  weight: number;
+  reps: number;
+  setNumber: number;
+}
+
+export interface WorkoutEntry {
+  id: string;
+  exerciseName: string;
+  exerciseId: string;
+  imageUrl: string;
+  date: string;
+  sets: WorkoutSet[];
+  bodyPart?: string;
+}
+
 export interface UserData {
   id?: string;
   email: string;
@@ -22,6 +39,7 @@ export interface UserData {
   updatedAt?: string;
   profileImageUrl?: string | null;
   dailyCalorieIntake?: { [date: string]: FoodEntry[] };
+  dailyWorkouts?: { [date: string]: WorkoutEntry[] };
 }
 
 @Injectable({
@@ -187,11 +205,11 @@ export class UserService {
 
       const entryDate = foodEntry.date || new Date().toISOString().split('T')[0];
       const dailyIntake = user.dailyCalorieIntake || {};
-
+      
       if (!dailyIntake[entryDate]) {
         dailyIntake[entryDate] = [];
       }
-
+      
       dailyIntake[entryDate].push(foodEntry);
 
       await updateDoc(userRef, {
@@ -231,6 +249,91 @@ export class UserService {
       return 0;
     }
     return user.dailyCalorieIntake[date].reduce((total, entry) => total + entry.calories, 0);
+  }
+
+  async addWorkoutEntry(userId: string, workoutEntry: WorkoutEntry): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const entryDate = workoutEntry.date || new Date().toISOString().split('T')[0];
+      const dailyWorkouts = user.dailyWorkouts || {};
+      
+      if (!dailyWorkouts[entryDate]) {
+        dailyWorkouts[entryDate] = [];
+      }
+      
+      dailyWorkouts[entryDate].push(workoutEntry);
+
+      await updateDoc(userRef, {
+        dailyWorkouts: dailyWorkouts,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error adding workout entry:', error);
+      throw error;
+    }
+  }
+
+  async removeWorkoutEntry(userId: string, date: string, entryId: string): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user?.dailyWorkouts?.[date]) {
+        return;
+      }
+
+      const dailyWorkouts = { ...user.dailyWorkouts };
+      dailyWorkouts[date] = dailyWorkouts[date].filter(entry => entry.id !== entryId);
+
+      await updateDoc(userRef, {
+        dailyWorkouts: dailyWorkouts,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error removing workout entry:', error);
+      throw error;
+    }
+  }
+
+  async updateWorkoutEntry(userId: string, date: string, entryId: string, workoutEntry: WorkoutEntry): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user?.dailyWorkouts?.[date]) {
+        throw new Error('Workout entry not found');
+      }
+
+      const dailyWorkouts = { ...user.dailyWorkouts };
+      const entryIndex = dailyWorkouts[date].findIndex(entry => entry.id === entryId);
+      
+      if (entryIndex === -1) {
+        throw new Error('Workout entry not found');
+      }
+
+      dailyWorkouts[date][entryIndex] = workoutEntry;
+
+      await updateDoc(userRef, {
+        dailyWorkouts: dailyWorkouts,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error updating workout entry:', error);
+      throw error;
+    }
+  }
+
+  getDailyWorkouts(user: UserData, date: string): WorkoutEntry[] {
+    if (!user.dailyWorkouts || !user.dailyWorkouts[date]) {
+      return [];
+    }
+    return user.dailyWorkouts[date];
   }
 
   async isAdmin(userId: string): Promise<boolean> {

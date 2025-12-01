@@ -1,0 +1,506 @@
+<div class="py-4 sm:py-8 px-4 max-w-4xl lg:max-w-6xl mx-auto" (click)="closeCalendarOnClickOutside($event)">
+    <div class="mb-6 sm:mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold" 
+         [ngClass]="{
+          'text-gray-900': !darkModeService.darkMode(),
+          'text-white' : darkModeService.darkMode()
+        }">
+          Workout Tracker
+        </h1>
+        
+        <div class="relative calendar-container w-full sm:w-auto">
+          <button (click)="calendarVisible = !calendarVisible; $event.stopPropagation()"
+            class="px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 hover:scale-105"
+            [ngClass]="{
+              'bg-black text-primary': !darkModeService.darkMode(),
+              'bg-blue-400 text-gray-900': darkModeService.darkMode()
+            }">
+            <span>{{ selectedDate === today ? 'Today' : selectedDate }}</span>
+            <lucide-angular [name]="CalendarIcon" class="w-4 h-4"></lucide-angular>
+          </button>
+          
+          <div *ngIf="calendarVisible" 
+            class="absolute right-0 sm:right-0 lg:right-auto lg:left-1/2 lg:-translate-x-1/2 left-0 sm:left-auto mt-2 z-50 p-3 sm:p-4 lg:p-5 rounded-lg shadow-xl calendar-container"
+            (click)="$event.stopPropagation()"
+            [ngClass]="{
+              'bg-white border border-gray-200': !darkModeService.darkMode(),
+              'bg-gray-800 border border-gray-700': darkModeService.darkMode()
+            }"
+            style="width: 100%; max-width: 300px; min-width: 280px;">
+            <div class="flex justify-between items-center mb-4">
+              <button (click)="previousMonth()" 
+                class="p-2 rounded hover:bg-gray-100"
+                [ngClass]="{'text-primary hover:bg-gray-700': darkModeService.darkMode()}">
+                <lucide-angular [name]="ChevronLeftIcon" class="w-5 h-5"></lucide-angular>
+              </button>
+              <button (click)="toggleMonthYearPicker()"
+                class="px-3 py-1 rounded hover:bg-gray-100 font-semibold"
+                [ngClass]="{
+                  'text-gray-900 hover:bg-gray-100': !darkModeService.darkMode(),
+                  'text-white hover:bg-gray-700': darkModeService.darkMode()
+                }">
+                {{ getMonthName() }} {{ currentYear }}
+              </button>
+              <button (click)="nextMonth()"
+                class="p-2 rounded hover:bg-gray-100"
+                [ngClass]="{'text-primary hover:bg-gray-700': darkModeService.darkMode()}">
+                <lucide-angular [name]="ChevronRightIcon" class="w-5 h-5"></lucide-angular>
+              </button>
+            </div>
+
+            <div *ngIf="showMonthYearPicker" 
+              class="mb-4 p-3 rounded-lg border"
+              [ngClass]="{
+                'bg-white border-gray-200': !darkModeService.darkMode(),
+                'bg-gray-800 border-gray-700': darkModeService.darkMode()
+              }">
+              <div class="mb-3">
+                <label class="block text-sm font-semibold mb-2"
+                  [ngClass]="{
+                    'text-gray-700': !darkModeService.darkMode(),
+                    'text-gray-300': darkModeService.darkMode()
+                  }">
+                  Select Month
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button *ngFor="let month of getMonthNames(); let i = index"
+                    (click)="selectMonth(i)"
+                    class="px-3 py-2 text-sm rounded transition-colors"
+                    [ngClass]="{
+                      'bg-blue-600 text-white': i === currentMonth && !darkModeService.darkMode(),
+                      'bg-blue-500 text-white': i === currentMonth && darkModeService.darkMode(),
+                      'bg-gray-100 text-gray-700 hover:bg-gray-200': i !== currentMonth && !darkModeService.darkMode(),
+                      'bg-gray-700 text-gray-300 hover:bg-gray-600': i !== currentMonth && darkModeService.darkMode()
+                    }">
+                    {{ month.substring(0, 3) }}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-2"
+                  [ngClass]="{
+                    'text-gray-700': !darkModeService.darkMode(),
+                    'text-gray-300': darkModeService.darkMode()
+                  }">
+                  Select Year
+                </label>
+                <select [(ngModel)]="currentYear"
+                  (change)="showMonthYearPicker = false"
+                  class="w-full px-3 py-2 rounded border"
+                  [ngClass]="{
+                    'bg-white border-gray-300 text-gray-900': !darkModeService.darkMode(),
+                    'bg-gray-700 border-gray-600 text-white': darkModeService.darkMode()
+                  }">
+                  <option *ngFor="let year of getAvailableYears()" [value]="year">
+                    {{ year }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            
+            <button (click)="goToToday()" 
+              class="w-full mb-3 px-3 py-1 text-sm rounded"
+              [ngClass]="{
+                'bg-blue-100 text-blue-700 hover:bg-blue-200': !darkModeService.darkMode(),
+                'bg-blue-900 text-blue-200 hover:bg-blue-800': darkModeService.darkMode()
+              }">
+              Go to Today
+            </button>
+            
+            <div class="grid grid-cols-7 gap-1 mb-2">
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                M
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                T
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                W
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                T
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                F
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                S
+              </div>
+              <div class="text-center text-xs font-semibold p-1"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }">
+                S
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-7 gap-1">
+              <button *ngFor="let day of getCalendarDays()"
+                (click)="selectDate(day.date)"
+                [disabled]="isFutureDate(day.date)"
+                class="p-2 text-sm rounded transition-colors relative"
+                [ngClass]="{
+                  'text-gray-400 cursor-not-allowed opacity-50': !day.isCurrentMonth || isFutureDate(day.date),
+                  'text-gray-900 hover:bg-gray-100': day.isCurrentMonth && !darkModeService.darkMode() && !isToday(day.date) && !isSelected(day.date) && !isFutureDate(day.date),
+                  'text-primary hover:bg-gray-700': day.isCurrentMonth && darkModeService.darkMode() && !isToday(day.date) && !isSelected(day.date) && !isFutureDate(day.date),
+                  'bg-blue-600 text-white font-bold': isToday(day.date) && !isSelected(day.date),
+                  'bg-blue-500 text-white font-bold ring-2 ring-blue-300': isSelected(day.date),
+                  'bg-blue-100 text-blue-700 font-bold': isToday(day.date) && !isSelected(day.date) && !darkModeService.darkMode()
+                }">
+                {{ day.day }}
+                <span *ngIf="hasWorkouts(day.date) && day.isCurrentMonth" 
+                  class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full"
+                  [ngClass]="{
+                    'bg-blue-600': !isSelected(day.date) && !isToday(day.date),
+                    'bg-white': isSelected(day.date) || (isToday(day.date) && darkModeService.darkMode()),
+                    'bg-blue-800': isToday(day.date) && !darkModeService.darkMode() && !isSelected(day.date)
+                  }">
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+   
+      <p class="text-sm" 
+         [ngClass]="{
+           'text-gray-600': !darkModeService.darkMode(),
+           'text-gray-300': darkModeService.darkMode()
+         }"> Search for exercises and track your workouts </p>
+    </div>
+   
+    <div class="mb-6 p-6 rounded-lg"
+         [ngClass]="{
+           'bg-white shadow-lg': !darkModeService.darkMode(),
+           'bg-gray-800': darkModeService.darkMode()
+         }">
+         
+         <h2 class="text-xl font-semibold mb-4"
+           [ngClass]="{
+             'text-gray-900': !darkModeService.darkMode(),
+             'text-white': darkModeService.darkMode()
+           }"> Search Exercise </h2>
+         
+         <div class="mb-4">
+           <div class="flex flex-col sm:flex-row gap-2 mb-2">
+             <select [(ngModel)]="selectedBodyPart"
+               (ngModelChange)="onBodyPartChange()"
+               class="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+               [ngClass]="{
+                 'border-gray-300 bg-white text-gray-900': !darkModeService.darkMode(),
+                 'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+               }">
+               <option value="">All Body Parts</option>
+               <option *ngFor="let bp of bodyParts" [value]="bp">
+                 {{ formatBodyPart(bp) }}
+               </option>
+             </select>
+             
+             <input type="text"
+               [(ngModel)]="searchQuery"
+               (input)="onSearchInput()"
+               (keyup.enter)="searchExercises()"
+               placeholder="Search for exercise..."
+               maxlength="10"
+               class="flex-1 w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+               [ngClass]="{
+                 'border-gray-300 bg-white': !darkModeService.darkMode() && !searchError,
+                 'border-red-500 bg-white': !darkModeService.darkMode() && searchError,
+                 'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode() && !searchError,
+                 'border-red-500 bg-gray-700 text-white': darkModeService.darkMode() && searchError
+               }" />
+
+             <button (click)="searchExercises()"
+               [disabled]="isLoading || !searchQuery.trim() || searchError"
+               class="w-full sm:w-auto px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 hover:scale-105"
+               [ngClass]="{
+                 'bg-black text-primary': !darkModeService.darkMode(),
+                 'bg-blue-400 text-gray-900': darkModeService.darkMode()
+               }">
+                 <span *ngIf="!isLoading">Search</span>
+                 <span *ngIf="isLoading">Searching...</span>
+             </button>
+           </div>
+           <p *ngIf="searchError" class="text-red-500 text-xs mt-1 ml-1">
+             {{ searchError }}
+           </p>
+         </div>
+
+         <div *ngIf="isLoading" class="text-center py-4"
+           [ngClass]="{
+             'text-gray-600': !darkModeService.darkMode(),
+             'text-gray-400': darkModeService.darkMode()
+           }">
+           Searching...
+         </div>
+
+         <div *ngIf="!isLoading && hasSearched && searchResults.length === 0 && searchQuery.trim().length >= 2" 
+           class="text-center py-8 rounded-lg border"
+           [ngClass]="{
+             'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
+             'border-gray-600 bg-gray-700': darkModeService.darkMode()
+           }">
+           <p class="text-base font-medium mb-2"
+             [ngClass]="{
+               'text-gray-900': !darkModeService.darkMode(),
+               'text-white': darkModeService.darkMode()
+             }">No exercises found</p>
+           <p class="text-sm"
+             [ngClass]="{
+               'text-gray-600': !darkModeService.darkMode(),
+               'text-gray-400': darkModeService.darkMode()
+             }">Try a different search term or body part filter</p>
+         </div>
+
+         <div *ngIf="searchResults.length > 0" class="space-y-2 mb-4">
+           <div *ngFor="let exercise of searchResults"
+             (click)="selectExercise(exercise)"
+             class="p-4 border rounded-lg cursor-pointer transition-all hover:scale-105"
+             [ngClass]="{
+               'border-gray-200 hover:border-blue-500': !darkModeService.darkMode() && selectedExercise?.id !== exercise.id,
+               'border-blue-500 bg-blue-50': !darkModeService.darkMode() && selectedExercise?.id === exercise.id,
+               'border-gray-600 hover:border-blue-400': darkModeService.darkMode() && selectedExercise?.id !== exercise.id,
+               'border-blue-200 bg-blue-900': darkModeService.darkMode() && selectedExercise?.id === exercise.id
+             }">
+               <div class="flex gap-2 sm:gap-4 items-start">
+                 <img [src]="exercise.gifUrl" 
+                      [alt]="exercise.name"
+                      class="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg flex-shrink-0"
+                      (error)="onImageErrorSmall($event)"
+                      loading="lazy">
+                 <div class="flex-1 min-w-0">
+                   <div class="font-semibold" 
+                     [ngClass]="{
+                       'text-gray-900': !darkModeService.darkMode(),
+                       'text-white': darkModeService.darkMode()
+                     }">{{ exercise.name }}</div>
+                   <div class="text-sm mt-1"
+                     [ngClass]="{
+                       'text-gray-600': !darkModeService.darkMode(),
+                       'text-gray-300': darkModeService.darkMode()
+                     }">{{ exercise.bodyPart }} • {{ exercise.equipment }}</div>
+                   <div *ngIf="exercise.target" class="text-xs mt-1"
+                     [ngClass]="{
+                       'text-gray-500': !darkModeService.darkMode(),
+                       'text-gray-400': darkModeService.darkMode()
+                     }">Target: {{ exercise.target }}</div>
+                 </div>
+               </div>
+           </div>
+         </div>
+
+         <div *ngIf="selectedExercise" class="mt-4 p-4 "
+          >
+           <div class="font-semibold mb-2"
+             [ngClass]="{
+               'text-blue-900': !darkModeService.darkMode(),
+               'text-blue-100': darkModeService.darkMode()
+             }">{{ selectedExercise.name }}</div>
+
+           <div class="mb-4">
+             <img [src]="selectedExercise.gifUrl || 'https://via.placeholder.com/400?text=Image+Not+Available'" 
+                  [alt]="selectedExercise.name"
+                  class="w-full max-w-full sm:max-w-md mx-auto rounded-lg"
+                  (error)="onImageError($event)"
+                  loading="lazy">
+           </div>
+
+           <div class="mb-4">
+             <label class="block text-sm mb-2"
+               [ngClass]="{
+                 'text-gray-700': !darkModeService.darkMode(),
+                 'text-gray-300': darkModeService.darkMode()
+               }">Number of Sets</label>
+             <input type="number"
+               [(ngModel)]="numberOfSets"
+               (ngModelChange)="setNumberOfSets(numberOfSets)"
+               min="1"
+               max="10"
+               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+               [ngClass]="{
+                 'border-gray-300 bg-white': !darkModeService.darkMode(),
+                 'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+               }" />
+           </div>
+
+           <div class="space-y-3 mb-4">
+             <div *ngFor="let set of selectedSets; let i = index"
+               class="p-3 border rounded-lg"
+               [ngClass]="{
+                 'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
+                 'border-gray-600 bg-gray-700': darkModeService.darkMode()
+               }">
+               <div class="flex items-center justify-between mb-2">
+                 <span class="font-semibold"
+                   [ngClass]="{
+                     'text-gray-900': !darkModeService.darkMode(),
+                     'text-white': darkModeService.darkMode()
+                   }">Set {{ set.setNumber }}</span>
+                 <button *ngIf="selectedSets.length > 1"
+                   (click)="removeSet(i)"
+                   class="text-red-500 hover:text-red-700 text-sm">
+                   Remove
+                 </button>
+               </div>
+               <div class="grid grid-cols-2 gap-2">
+                 <div>
+                   <label class="block text-xs mb-1"
+                     [ngClass]="{
+                       'text-gray-700': !darkModeService.darkMode(),
+                       'text-gray-300': darkModeService.darkMode()
+                     }">Weight (kg)</label>
+                   <input type="number"
+                     [(ngModel)]="set.weight"
+                     min="0"
+                     step="0.5"
+                     [placeholder]="set.weight > 0 ? '' : 'Weight (kg)'"
+                     class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                     [ngClass]="{
+                       'border-gray-300 bg-white': !darkModeService.darkMode(),
+                       'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+                     }" />
+                 </div>
+                 <div>
+                   <label class="block text-xs mb-1"
+                     [ngClass]="{
+                       'text-gray-700': !darkModeService.darkMode(),
+                       'text-gray-300': darkModeService.darkMode()
+                     }">Reps</label>
+                   <input type="number"
+                     [(ngModel)]="set.reps"
+                     min="0"
+                     [placeholder]="set.reps > 0 ? '' : 'Reps'"
+                     class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                     [ngClass]="{
+                       'border-gray-300 bg-white': !darkModeService.darkMode(),
+                       'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
+                     }" />
+                 </div>
+               </div>
+             </div>
+           </div>
+
+           <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+             <button *ngIf="editingWorkout" (click)="cancelEdit()"
+               class="w-full sm:flex-1 px-6 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
+               [ngClass]="{
+                 'bg-gray-500 text-white hover:bg-gray-600': !darkModeService.darkMode(),
+                 'bg-gray-600 text-white hover:bg-gray-700': darkModeService.darkMode()
+               }">Cancel</button>
+             <button (click)="saveWorkout()"
+               class="w-full sm:flex-1 px-6 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
+               [ngClass]="{
+                 'bg-blue-400 text-white hover:bg-blue-500': !darkModeService.darkMode(),
+                 'bg-accent1 text-gray-900 hover:bg-orange-700': darkModeService.darkMode()
+               }">
+               {{ editingWorkout ? 'Update Workout' : 'Save Workout' }}
+             </button>
+           </div>
+         </div>
+     </div>
+   
+     <div class="p-6 rounded-lg"
+          [ngClass]="{
+            'bg-white shadow-lg': !darkModeService.darkMode(),
+            'bg-gray-800': darkModeService.darkMode()
+          }">
+         <h2 class="text-xl font-semibold mb-4"
+           [ngClass]="{
+             'text-gray-900': !darkModeService.darkMode(),
+             'text-white': darkModeService.darkMode()
+           }">
+           {{ selectedDate === today ? "Today's" : "Selected Date's" }} Workouts
+           <span class="text-sm font-normal ml-2"
+             [ngClass]="{
+               'text-gray-600': !darkModeService.darkMode(),
+               'text-gray-400': darkModeService.darkMode()
+             }">
+             ({{ selectedDate }})
+           </span>
+         </h2>
+   
+         <div *ngIf="todayWorkouts.length === 0"
+              class="text-center py-8"
+              [ngClass]="{
+                'text-gray-500': !darkModeService.darkMode(),
+                'text-gray-400': darkModeService.darkMode()
+              }">
+              No workouts for {{ selectedDate === today ? 'today' : 'this date' }}. Start tracking your exercises!
+         </div>
+   
+         <div *ngIf="todayWorkouts.length > 0" class="space-y-4">
+           <div *ngFor="let workout of todayWorkouts"
+             class="p-4 border rounded-lg"
+             [ngClass]="{
+               'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
+               'border-gray-600 bg-gray-700': darkModeService.darkMode()
+             }">
+               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-start mb-3 gap-3">
+                 <div class="flex-1 min-w-0" (click)="editWorkout(workout)" style="cursor: pointer;">
+                   <div class="font-semibold text-base sm:text-lg mb-2"
+                     [ngClass]="{
+                       'text-gray-900': !darkModeService.darkMode(),
+                       'text-white': darkModeService.darkMode()
+                     }">{{ workout.exerciseName }}</div>
+                   <div *ngIf="workout.bodyPart" class="text-sm mb-2"
+                     [ngClass]="{
+                       'text-gray-600': !darkModeService.darkMode(),
+                       'text-gray-400': darkModeService.darkMode()
+                     }">{{ workout.bodyPart }}</div>
+                 </div>
+                 <div class="flex gap-2 w-full sm:w-auto sm:ml-4">
+                   <button (click)="editWorkout(workout); $event.stopPropagation()"
+                     class="flex-1 sm:flex-none px-4 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
+                     [ngClass]="{
+                       'bg-black text-primary hover:bg-gray-800': !darkModeService.darkMode(),
+                       'bg-blue-400 text-gray-900 hover:bg-blue-500': darkModeService.darkMode()
+                     }">Edit</button>
+                   <button (click)="removeWorkoutEntry(workout.id); $event.stopPropagation()"
+                     class="flex-1 sm:flex-none px-4 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
+                     [ngClass]="{
+                       'bg-red-200 text-red-700 hover:bg-red-300': !darkModeService.darkMode(),
+                       'bg-red-900 text-red-200 hover:bg-red-800': darkModeService.darkMode()
+                     }">Remove</button>
+                 </div>
+               </div>
+               <div class="space-y-2">
+                 <div *ngFor="let set of workout.sets"
+                   class="text-sm"
+                   [ngClass]="{
+                     'text-gray-700': !darkModeService.darkMode(),
+                     'text-gray-300': darkModeService.darkMode()
+                   }">
+                   Set {{ set.setNumber }}: {{ set.weight }} kg × {{ set.reps }} reps
+                 </div>
+               </div>
+           </div>
+         </div>
+     </div>
+   </div>
+
