@@ -1,135 +1,612 @@
-<div class="min-h-screen p-4 sm:p-6 lg:p-8" style="padding-top: 7rem;">
+<div class="min-h-screen p-4 sm:p-6 lg:p-8" style="padding-top: 7rem;" (click)="closeDatePickerOnClickOutside($event)">
   <div class="max-w-6xl mx-auto">
     
-    <div class="text-center mb-8">
-      <h1 class="text-3xl sm:text-4xl font-bold mb-4" [ngClass]="{
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold" [ngClass]="{
         'text-gray-900': !darkModeService.darkMode(),
         'text-white': darkModeService.darkMode()
       }">
-        Weekly Statistics
+        Statistics
       </h1>
-      <p class="text-lg sm:text-xl" [ngClass]="{
-        'text-gray-600': !darkModeService.darkMode(),
-        'text-gray-300': darkModeService.darkMode()
-      }">
-        {{ weekStartDate }} - {{ weekEndDate }}
-      </p>
-    </div>
-
-    <div *ngIf="isLoading" class="text-center py-12">
-      <p [ngClass]="{
-        'text-gray-600': !darkModeService.darkMode(),
-        'text-gray-300': darkModeService.darkMode()
-      }">Loading statistics...</p>
-    </div>
-
-    <div *ngIf="!isLoading && weeklyStats.length === 0" class="text-center py-12">
-      <p class="text-lg mb-4" [ngClass]="{
-        'text-gray-600': !darkModeService.darkMode(),
-        'text-gray-300': darkModeService.darkMode()
-      }">
-        No workout plan found. Please generate a workout plan first.
-      </p>
-      <button
-        (click)="navigateToWorkouts()"
-        class="px-6 py-3 rounded-lg font-semibold transition-colors"
-        [ngClass]="{
-          'px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed':
-            true,
-          'bg-black text-white hover:scale-105': !darkModeService.darkMode(),
-          'bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
-        }"
-      >
-        Go to Workouts
-      </button>
-    </div>
-
-    <div *ngIf="!isLoading && weeklyStats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-      <div
-        *ngFor="let stat of weeklyStats"
-        class="rounded-lg shadow-lg p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:scale-105"
-        [ngClass]="{
-          'bg-white border-2 border-gray-200': !darkModeService.darkMode(),
-          'bg-gray-800 border-2 border-gray-700': darkModeService.darkMode()
-        }"
-        (click)="toggleCategory(stat.category)"
-      >
-        <div class="mb-4">
-          <h3 class="text-xl sm:text-2xl font-bold mb-2" [ngClass]="{
-            'text-gray-900': !darkModeService.darkMode(),
-            'text-white': darkModeService.darkMode()
-          }">
-            {{ stat.categoryName }}
-          </h3>
-          <p class="text-sm sm:text-base" [ngClass]="{
-            'text-gray-600': !darkModeService.darkMode(),
-            'text-gray-300': darkModeService.darkMode()
-          }">
-            {{ stat.loggedCount }} / {{ stat.expectedCount }} exercises
-          </p>
-        </div>
-
-        <div class="w-full bg-gray-200 rounded-full h-4 mb-2" [ngClass]="{'bg-gray-700': darkModeService.darkMode()}">
-          <div
-            class="h-4 rounded-full transition-all duration-300"
-            [ngClass]="{
-              'bg-blue-600': stat.percentage <= 100 && !darkModeService.darkMode(),
-              'bg-blue-500': stat.percentage <= 100 && darkModeService.darkMode(),
-              'bg-green-600': stat.percentage > 100 && !darkModeService.darkMode(),
-              'bg-green-500': stat.percentage > 100 && darkModeService.darkMode()
-            }"
-            [style.width.%]="stat.percentage"
-          ></div>
-        </div>
-
-        <div class="text-sm font-semibold" [ngClass]="{
-          'text-blue-600': !darkModeService.darkMode(),
-          'text-blue-400': darkModeService.darkMode()
-        }">
-          {{ stat.percentage }}%
-        </div>
-
-        <div
-          *ngIf="isCategoryExpanded(stat.category)"
-          class="mt-4 pt-4 border-t"
+      <div class="relative date-picker-container w-full sm:w-auto">
+        <button
+          (click)="openDatePicker(); $event.stopPropagation()"
+          class="w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition-all flex items-center justify-center sm:justify-start gap-2 hover:scale-105"
           [ngClass]="{
-            'border-gray-200': !darkModeService.darkMode(),
-            'border-gray-700': darkModeService.darkMode()
+            'bg-black text-white': !darkModeService.darkMode(),
+            'bg-blue-400 text-gray-900': darkModeService.darkMode()
           }"
         >
-          <p class="text-sm font-semibold mb-2" [ngClass]="{
-            'text-gray-700': !darkModeService.darkMode(),
-            'text-gray-300': darkModeService.darkMode()
-          }">
-            Logged Exercises:
-          </p>
-          <ul class="space-y-1 mb-3">
-            <li
-              *ngFor="let exercise of getCategoryExercises(stat.category)"
-              class="text-sm"
+          <span class="text-sm sm:text-base">{{ weekStartDate }} - {{ weekEndDate }}</span>
+          <lucide-angular [name]="CalendarIcon" class="w-4 h-4"></lucide-angular>
+        </button>
+        
+        <div
+          *ngIf="datePickerVisible"
+          class="absolute right-0 sm:right-0 left-0 sm:left-auto mt-2 w-full sm:w-80 rounded-lg shadow-xl z-50 p-3 sm:p-4 date-picker-container"
+          (click)="$event.stopPropagation()"
+          [ngClass]="{
+            'bg-white border border-gray-200': !darkModeService.darkMode(),
+            'bg-gray-800 border border-gray-700': darkModeService.darkMode()
+          }"
+        >
+          <!-- Year Selection -->
+          <div *ngIf="datePickerStep === 'year'" class="space-y-3 sm:space-y-4">
+            <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3" [ngClass]="{
+              'text-gray-900': !darkModeService.darkMode(),
+              'text-white': darkModeService.darkMode()
+            }">
+              Select Year
+            </h3>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                *ngFor="let year of availableYears"
+                (click)="selectYear(year)"
+                class="px-4 py-2 rounded-lg transition-colors"
+                [ngClass]="{
+                  'bg-blue-600 text-white': year === selectedPickerYear && !darkModeService.darkMode(),
+                  'bg-blue-500 text-white': year === selectedPickerYear && darkModeService.darkMode(),
+                  'bg-gray-100 text-gray-700 hover:bg-gray-200': year !== selectedPickerYear && !darkModeService.darkMode(),
+                  'bg-gray-700 text-gray-300 hover:bg-gray-600': year !== selectedPickerYear && darkModeService.darkMode()
+                }"
+              >
+                {{ year }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="datePickerStep === 'month'" class="space-y-3 sm:space-y-4">
+            <div class="flex items-center justify-between mb-2 sm:mb-3">
+              <button
+                (click)="datePickerStep = 'year'"
+                class="px-2 py-1 rounded text-xs sm:text-sm"
+                [ngClass]="{
+                  'text-gray-700 bg-black text-white hover:scale-105': !darkModeService.darkMode(),
+                  'text-gray-900 bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+                }"
+              >
+                Back
+              </button>
+              <h3 class="text-base sm:text-lg font-semibold" [ngClass]="{
+                'text-gray-900': !darkModeService.darkMode(),
+                'text-white': darkModeService.darkMode()
+              }">
+                Select Month
+              </h3>
+              <div></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                *ngFor="let month of getMonthNames(); let i = index"
+                (click)="selectMonth(i + 1)"
+                class="px-3 py-2 text-sm rounded transition-colors"
+                [ngClass]="{
+                  'bg-blue-600 text-white': (i + 1) === selectedPickerMonth && !darkModeService.darkMode(),
+                  'bg-blue-500 text-white': (i + 1) === selectedPickerMonth && darkModeService.darkMode(),
+                  'bg-gray-100 text-gray-700 hover:bg-gray-200': (i + 1) !== selectedPickerMonth && !darkModeService.darkMode(),
+                  'bg-gray-700 text-gray-300 hover:bg-gray-600': (i + 1) !== selectedPickerMonth && darkModeService.darkMode()
+                }"
+              >
+                {{ month.substring(0, 3) }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="datePickerStep === 'week'" class="space-y-3 sm:space-y-4">
+            <div class="flex items-center justify-between mb-2 sm:mb-3 gap-2">
+              <button
+                (click)="datePickerStep = 'month'"
+                class="px-2 py-1 rounded text-xs sm:text-sm flex-shrink-0"
+                [ngClass]="{
+                  'text-gray-700 bg-black text-white hover:scale-105': !darkModeService.darkMode(),
+                  'text-gray-900 bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+                }"
+              >
+                Back
+              </button>
+              <h3 class="text-base sm:text-lg font-semibold flex-1 text-center" [ngClass]="{
+                'text-gray-900': !darkModeService.darkMode(),
+                'text-white': darkModeService.darkMode()
+              }">
+                Select Week
+              </h3>
+              <button
+                (click)="goToCurrentWeek()"
+                class="px-2 py-1 sm:py-2 rounded text-xs flex-shrink-0"
+                [ngClass]="{
+                  'bg-blue-400 text-gray-900 hover:scale-105': !darkModeService.darkMode(),
+                  'bg-orange-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+                }"
+              >
+                Current Week
+              </button>
+            </div>
+            <div class="max-h-48 sm:max-h-64 overflow-y-auto space-y-2">
+              <button
+                *ngFor="let week of availableWeeks"
+                (click)="selectWeek(week.weekStart, week.weekOffset)"
+                class="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded transition-colors text-left"
+                [ngClass]="{
+                  'bg-blue-600 text-white': selectedPickerWeek?.weekStart === week.weekStart && !darkModeService.darkMode(),
+                  'bg-blue-500 text-white': selectedPickerWeek?.weekStart === week.weekStart && darkModeService.darkMode(),
+                  'bg-gray-100 text-gray-700 hover:bg-gray-200': selectedPickerWeek?.weekStart !== week.weekStart && !darkModeService.darkMode(),
+                  'bg-gray-700 text-gray-300 hover:bg-gray-600': selectedPickerWeek?.weekStart !== week.weekStart && darkModeService.darkMode()
+                }"
+              >
+                {{ week.label }}
+              </button>
+            </div>
+            <button
+              (click)="confirmDateSelection()"
+              [disabled]="!canConfirmSelection()"
+              class="w-full px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               [ngClass]="{
-                'text-gray-600': !darkModeService.darkMode(),
-                'text-gray-400': darkModeService.darkMode()
+                'bg-blue-600 text-white hover:bg-blue-700': !darkModeService.darkMode() && canConfirmSelection(),
+                'bg-blue-500 text-white hover:bg-blue-600': darkModeService.darkMode() && canConfirmSelection(),
+                'bg-gray-300 text-gray-500': !canConfirmSelection()
               }"
             >
-              • {{ exercise }}
-            </li>
-            <li
-              *ngIf="getCategoryExercises(stat.category).length === 0"
-              class="text-sm italic text-gray-500"
-            >
-              No exercises logged yet
-            </li>
-          </ul>
-          <p class="text-xs italic mt-2 pt-2 border-t" [ngClass]="{
-            'text-gray-500 border-gray-200': !darkModeService.darkMode(),
-            'text-gray-500 border-gray-700': darkModeService.darkMode()
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4" [ngClass]="{
+        'text-blue-700': !darkModeService.darkMode(),
+        'text-blue-300': darkModeService.darkMode()
+      }">
+        Weekly Statistics
+      </h2>
+
+      <!-- Weekly Calorie Summary -->
+      <div *ngIf="weeklyCalorieStats" class="mb-8">
+        <div
+          class="rounded-lg shadow-lg p-4 sm:p-6 cursor-pointer transition-all duration-200"
+          [ngClass]="{
+            'bg-white border-2 border-gray-200': !darkModeService.darkMode(),
+            'bg-gray-800 border-2 border-gray-700': darkModeService.darkMode()
+          }"
+          (click)="toggleWeeklyCalories()"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <h3 class="text-xl sm:text-2xl font-bold mb-2" [ngClass]="{
+                'text-blue-600': !darkModeService.darkMode(),
+                'text-blue-400': darkModeService.darkMode()
+              }">
+                Weekly Calorie Intake
+              </h3>
+              <p class="text-sm sm:text-base mb-2" [ngClass]="{
+                'text-gray-600': !darkModeService.darkMode(),
+                'text-gray-300': darkModeService.darkMode()
+              }">
+                {{ weeklyCalorieStats.totalCalories }} / {{ weeklyCalorieStats.targetCalories }} kcal
+              </p>
+              <div class="w-full bg-gray-200 rounded-full h-4 mb-2" [ngClass]="{'bg-gray-700': darkModeService.darkMode()}">
+                <div
+                  class="h-4 rounded-full transition-all duration-300"
+                  [ngClass]="{
+                    'bg-blue-600': weeklyCalorieStats.percentage <= 100 && !darkModeService.darkMode(),
+                    'bg-blue-500': weeklyCalorieStats.percentage <= 100 && darkModeService.darkMode(),
+                    'bg-green-600': weeklyCalorieStats.percentage > 100 && !darkModeService.darkMode(),
+                    'bg-green-500': weeklyCalorieStats.percentage > 100 && darkModeService.darkMode()
+                  }"
+                  [style.width.%]="weeklyCalorieStats.percentage"
+                ></div>
+              </div>
+              <div class="text-sm font-semibold" [ngClass]="{
+                'text-blue-600': !darkModeService.darkMode(),
+                'text-blue-400': darkModeService.darkMode()
+              }">
+                {{ weeklyCalorieStats.percentage }}%
+              </div>
+            </div>
+            <div class="ml-4 text-2xl">
+              {{ expandedWeeklyCalories ? '▼' : '▶' }}
+            </div>
+          </div>
+
+          <!-- Daily Breakdown -->
+          <div *ngIf="expandedWeeklyCalories" class="mt-4 pt-4 border-t" [ngClass]="{
+            'border-gray-200': !darkModeService.darkMode(),
+            'border-gray-700': darkModeService.darkMode()
           }">
-            Matches body parts: {{ getCategoryBodyPartsText(stat.category) }}
-          </p>
+              <h3 class="text-lg font-semibold mb-3" [ngClass]="{
+                'text-blue-500': !darkModeService.darkMode(),
+                'text-blue-300': darkModeService.darkMode()
+              }">
+                Daily Breakdown
+              </h3>
+            <div class="space-y-3">
+              <div
+                *ngFor="let day of weeklyCalorieStats.dailyStats"
+                class="p-3 rounded-lg"
+                [ngClass]="{
+                  'bg-gray-50': !darkModeService.darkMode(),
+                  'bg-gray-700': darkModeService.darkMode()
+                }"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="font-semibold" [ngClass]="{
+                      'text-gray-900': !darkModeService.darkMode(),
+                      'text-white': darkModeService.darkMode()
+                    }">
+                      {{ getDayName(day.date) }} - {{ formatDateFull(day.date) }}
+                    </p>
+                    <p class="text-sm" [ngClass]="{
+                      'text-gray-600': !darkModeService.darkMode(),
+                      'text-gray-300': darkModeService.darkMode()
+                    }">
+                      {{ day.calories }} / {{ day.target }} kcal
+                    </p>
+                  </div>
+                  <div class="text-sm font-semibold" [ngClass]="{
+                    'text-blue-600': !darkModeService.darkMode(),
+                    'text-blue-400': darkModeService.darkMode()
+                  }">
+                    {{ day.percentage }}%
+                  </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3" [ngClass]="{'bg-gray-600': darkModeService.darkMode()}">
+                  <div
+                    class="h-3 rounded-full transition-all duration-300"
+                    [ngClass]="{
+                      'bg-blue-600': day.percentage <= 100 && !darkModeService.darkMode(),
+                      'bg-blue-500': day.percentage <= 100 && darkModeService.darkMode(),
+                      'bg-green-600': day.percentage > 100 && !darkModeService.darkMode(),
+                      'bg-green-500': day.percentage > 100 && darkModeService.darkMode()
+                    }"
+                    [style.width.%]="day.percentage"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="text-center py-12">
+        <p [ngClass]="{
+          'text-gray-600': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">Loading statistics...</p>
+      </div>
+
+      <div *ngIf="!isLoading && weeklyStats.length === 0" class="text-center py-12">
+        <p class="text-lg mb-4" [ngClass]="{
+          'text-gray-600': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">
+          No workout plan found. Please generate a workout plan first.
+        </p>
+        <button
+          (click)="navigateToWorkouts()"
+          class="px-6 py-3 rounded-lg font-semibold transition-colors"
+          [ngClass]="{
+            'px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed':
+              true,
+            'bg-black text-white hover:scale-105': !darkModeService.darkMode(),
+            'bg-blue-400 text-gray-900 hover:scale-105': darkModeService.darkMode()
+          }"
+        >
+          Go to Workout Plan
+        </button>
+      </div>
+
+      <div *ngIf="!isLoading && weeklyStats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div
+          *ngFor="let stat of weeklyStats"
+          class="rounded-lg shadow-lg p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:scale-105"
+          [ngClass]="{
+            'bg-white border-2 border-gray-200': !darkModeService.darkMode(),
+            'bg-gray-800 border-2 border-gray-700': darkModeService.darkMode()
+          }"
+          (click)="toggleCategory(stat.category)"
+        >
+          <div class="mb-4">
+            <h3 class="text-xl sm:text-2xl font-bold mb-2" [ngClass]="{
+              'text-gray-900': !darkModeService.darkMode(),
+              'text-white': darkModeService.darkMode()
+            }">
+              {{ stat.categoryName }}
+            </h3>
+            <p class="text-sm sm:text-base" [ngClass]="{
+              'text-gray-600': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              {{ stat.loggedCount }} / {{ stat.expectedCount }} exercises
+            </p>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-4 mb-2" [ngClass]="{'bg-gray-700': darkModeService.darkMode()}">
+            <div
+              class="h-4 rounded-full transition-all duration-300"
+              [ngClass]="{
+                'bg-blue-600': stat.percentage <= 100 && !darkModeService.darkMode(),
+                'bg-blue-500': stat.percentage <= 100 && darkModeService.darkMode(),
+                'bg-green-600': stat.percentage > 100 && !darkModeService.darkMode(),
+                'bg-green-500': stat.percentage > 100 && darkModeService.darkMode()
+              }"
+              [style.width.%]="stat.percentage"
+            ></div>
+          </div>
+
+          <div class="text-sm font-semibold" [ngClass]="{
+            'text-blue-600': !darkModeService.darkMode(),
+            'text-blue-400': darkModeService.darkMode()
+          }">
+            {{ stat.percentage }}%
+          </div>
+
+          <div
+            *ngIf="isCategoryExpanded(stat.category)"
+            class="mt-4 pt-4 border-t"
+            [ngClass]="{
+              'border-gray-200': !darkModeService.darkMode(),
+              'border-gray-700': darkModeService.darkMode()
+            }"
+          >
+            <p class="text-sm font-semibold mb-2" [ngClass]="{
+              'text-gray-700': !darkModeService.darkMode(),
+              'text-gray-300': darkModeService.darkMode()
+            }">
+              Logged Exercises:
+            </p>
+            <ul class="space-y-1 mb-3">
+              <li
+                *ngFor="let exercise of getCategoryExercises(stat.category)"
+                class="text-sm"
+                [ngClass]="{
+                  'text-gray-600': !darkModeService.darkMode(),
+                  'text-gray-400': darkModeService.darkMode()
+                }"
+              >
+                • {{ exercise }}
+              </li>
+              <li
+                *ngIf="getCategoryExercises(stat.category).length === 0"
+                class="text-sm italic text-gray-500"
+              >
+                No exercises logged yet
+              </li>
+            </ul>
+            <p class="text-xs italic mt-2 pt-2 border-t" [ngClass]="{
+              'text-gray-500 border-gray-200': !darkModeService.darkMode(),
+              'text-gray-500 border-gray-700': darkModeService.darkMode()
+            }">
+              Matches body parts: {{ getCategoryBodyPartsText(stat.category) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4" [ngClass]="{
+        'text-orange-600': !darkModeService.darkMode(),
+        'text-orange-400': darkModeService.darkMode()
+      }">
+        Monthly Statistics - {{ monthName }}
+      </h2>
+
+      <!-- Monthly Calorie Summary -->
+      <div *ngIf="monthlyCalorieStats" class="mb-8">
+        <div
+          class="rounded-lg shadow-lg p-4 sm:p-6 cursor-pointer transition-all duration-200"
+          [ngClass]="{
+            'bg-white border-2 border-gray-200': !darkModeService.darkMode(),
+            'bg-gray-800 border-2 border-gray-700': darkModeService.darkMode()
+          }"
+          (click)="toggleMonthlyCalories()"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <h3 class="text-xl sm:text-2xl font-bold mb-2" [ngClass]="{
+                'text-orange-600': !darkModeService.darkMode(),
+                'text-orange-400': darkModeService.darkMode()
+              }">
+                Monthly Calorie Intake
+              </h3>
+              <p class="text-sm sm:text-base mb-2" [ngClass]="{
+                'text-gray-600': !darkModeService.darkMode(),
+                'text-gray-300': darkModeService.darkMode()
+              }">
+                {{ monthlyCalorieStats.totalCalories }} / {{ monthlyCalorieStats.targetCalories }} kcal
+              </p>
+              <div class="w-full bg-gray-200 rounded-full h-4 mb-2" [ngClass]="{'bg-gray-700': darkModeService.darkMode()}">
+                <div
+                  class="h-4 rounded-full transition-all duration-300"
+                  [ngClass]="{
+                    'bg-blue-600': monthlyCalorieStats.percentage <= 100 && !darkModeService.darkMode(),
+                    'bg-blue-500': monthlyCalorieStats.percentage <= 100 && darkModeService.darkMode(),
+                    'bg-green-600': monthlyCalorieStats.percentage > 100 && !darkModeService.darkMode(),
+                    'bg-green-500': monthlyCalorieStats.percentage > 100 && darkModeService.darkMode()
+                  }"
+                  [style.width.%]="monthlyCalorieStats.percentage"
+                ></div>
+              </div>
+              <div class="text-sm font-semibold" [ngClass]="{
+                'text-blue-600': !darkModeService.darkMode(),
+                'text-blue-400': darkModeService.darkMode()
+              }">
+                {{ monthlyCalorieStats.percentage }}%
+              </div>
+            </div>
+            <div class="ml-4 text-2xl">
+              {{ expandedMonthlyCalories ? '▼' : '▶' }}
+            </div>
+          </div>
+
+          <!-- Weekly Breakdown -->
+          <div *ngIf="expandedMonthlyCalories" class="mt-4 pt-4 border-t" [ngClass]="{
+            'border-gray-200': !darkModeService.darkMode(),
+            'border-gray-700': darkModeService.darkMode()
+          }">
+            <h3 class="text-lg font-semibold mb-3" [ngClass]="{
+              'text-orange-500': !darkModeService.darkMode(),
+              'text-orange-300': darkModeService.darkMode()
+            }">
+              Weekly Breakdown
+            </h3>
+            <div class="space-y-3">
+              <div
+                *ngFor="let week of monthlyCalorieStats.weeklyStats"
+                class="p-3 rounded-lg cursor-pointer"
+                [ngClass]="{
+                  'bg-gray-50': !darkModeService.darkMode(),
+                  'bg-gray-700': darkModeService.darkMode()
+                }"
+                (click)="toggleWeekInMonth(week.weekStart); $event.stopPropagation()"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="font-semibold" [ngClass]="{
+                      'text-gray-900': !darkModeService.darkMode(),
+                      'text-white': darkModeService.darkMode()
+                    }">
+                      {{ formatDateFull(week.weekStart) }} - {{ formatDateFull(week.weekEnd) }}
+                    </p>
+                    <p class="text-sm" [ngClass]="{
+                      'text-gray-600': !darkModeService.darkMode(),
+                      'text-gray-300': darkModeService.darkMode()
+                    }">
+                      {{ week.totalCalories }} / {{ week.targetCalories }} kcal
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="text-sm font-semibold" [ngClass]="{
+                      'text-blue-600': !darkModeService.darkMode(),
+                      'text-blue-400': darkModeService.darkMode()
+                    }">
+                      {{ week.percentage }}%
+                    </div>
+                    <span>{{ expandedWeekInMonth === week.weekStart ? '▼' : '▶' }}</span>
+                  </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3" [ngClass]="{'bg-gray-600': darkModeService.darkMode()}">
+                  <div
+                    class="h-3 rounded-full transition-all duration-300"
+                    [ngClass]="{
+                      'bg-blue-600': week.percentage <= 100 && !darkModeService.darkMode(),
+                      'bg-blue-500': week.percentage <= 100 && darkModeService.darkMode(),
+                      'bg-green-600': week.percentage > 100 && !darkModeService.darkMode(),
+                      'bg-green-500': week.percentage > 100 && darkModeService.darkMode()
+                    }"
+                    [style.width.%]="week.percentage"
+                  ></div>
+                </div>
+
+                <!-- Daily Breakdown for Week -->
+                <div *ngIf="expandedWeekInMonth === week.weekStart" class="mt-3 pt-3 border-t space-y-2" [ngClass]="{
+                  'border-gray-200': !darkModeService.darkMode(),
+                  'border-gray-600': darkModeService.darkMode()
+                }">
+                  <div
+                    *ngFor="let day of week.dailyStats"
+                    class="p-2 rounded"
+                    [ngClass]="{
+                      'bg-gray-100': !darkModeService.darkMode(),
+                      'bg-gray-600': darkModeService.darkMode()
+                    }"
+                  >
+                    <div class="flex items-center justify-between mb-1">
+                      <p class="text-sm font-medium" [ngClass]="{
+                        'text-gray-800': !darkModeService.darkMode(),
+                        'text-gray-200': darkModeService.darkMode()
+                      }">
+                        {{ getDayName(day.date) }} - {{ formatDateFull(day.date) }}
+                      </p>
+                      <p class="text-xs" [ngClass]="{
+                        'text-gray-600': !darkModeService.darkMode(),
+                        'text-gray-400': darkModeService.darkMode()
+                      }">
+                        {{ day.calories }} / {{ day.target }} kcal ({{ day.percentage }}%)
+                      </p>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2" [ngClass]="{'bg-gray-500': darkModeService.darkMode()}">
+                      <div
+                        class="h-2 rounded-full transition-all duration-300"
+                        [ngClass]="{
+                          'bg-blue-600': day.percentage <= 100 && !darkModeService.darkMode(),
+                          'bg-blue-500': day.percentage <= 100 && darkModeService.darkMode(),
+                          'bg-green-600': day.percentage > 100 && !darkModeService.darkMode(),
+                          'bg-green-500': day.percentage > 100 && darkModeService.darkMode()
+                        }"
+                        [style.width.%]="day.percentage"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="text-center py-12">
+        <p [ngClass]="{
+          'text-gray-600': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">Loading statistics...</p>
+      </div>
+
+      <div *ngIf="!isLoading && monthlyStats.length === 0 && !monthlyCalorieStats" class="text-center py-12">
+        <p class="text-lg" [ngClass]="{
+          'text-gray-600': !darkModeService.darkMode(),
+          'text-gray-300': darkModeService.darkMode()
+        }">
+          No exercises logged for this month.
+        </p>
+      </div>
+
+      <div *ngIf="!isLoading && monthlyStats.length > 0" class="space-y-4 mb-8">
+        <div
+          *ngFor="let stat of monthlyStats; let i = index"
+          class="rounded-lg shadow-lg p-4 sm:p-6"
+          [ngClass]="{
+            'bg-white border-2 border-gray-200': !darkModeService.darkMode(),
+            'bg-gray-800 border-2 border-gray-700': darkModeService.darkMode()
+          }"
+        >
+          <div class="flex items-center gap-4">
+            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full text-2xl font-bold"
+              [ngClass]="{
+                'bg-yellow-400 text-yellow-900': stat.medal === 'gold',
+                'bg-gray-300 text-gray-700': stat.medal === 'silver',
+                'bg-orange-300 text-orange-900': stat.medal === 'bronze',
+                'bg-gray-200 text-gray-600': !stat.medal && !darkModeService.darkMode(),
+                'bg-gray-700 text-gray-400': !stat.medal && darkModeService.darkMode()
+              }"
+            >
+              {{ i + 1 }}
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl sm:text-2xl font-bold mb-1" [ngClass]="{
+                'text-gray-900': !darkModeService.darkMode(),
+                'text-white': darkModeService.darkMode()
+              }">
+                {{ stat.exerciseName }}
+              </h3>
+              <div class="flex gap-4 text-sm" [ngClass]="{
+                'text-gray-600': !darkModeService.darkMode(),
+                'text-gray-300': darkModeService.darkMode()
+              }">
+                <span><strong>{{ stat.totalSets }}</strong> sets</span>
+                <span><strong>{{ stat.workoutCount }}</strong> workouts</span>
+              </div>
+            </div>
+            <div *ngIf="stat.medal" class="text-4xl">
+              <span *ngIf="stat.medal === 'gold'">🥇</span>
+              <span *ngIf="stat.medal === 'silver'">🥈</span>
+              <span *ngIf="stat.medal === 'bronze'">🥉</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-

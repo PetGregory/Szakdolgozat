@@ -40,6 +40,8 @@ export interface UserData {
   profileImageUrl?: string | null;
   dailyCalorieIntake?: { [date: string]: FoodEntry[] };
   dailyWorkouts?: { [date: string]: WorkoutEntry[] };
+  weeklyStatistics?: { [weekKey: string]: any };
+  monthlyStatistics?: { [monthKey: string]: any };
 }
 
 @Injectable({
@@ -397,6 +399,56 @@ export class UserService {
       await deleteDoc(userRef);
     } catch (error) {
       console.error('Error deleting user:', error);
+      throw error;
+    }
+  }
+
+  async saveWeeklyStatistics(userId: string, weekKey: string, stats: any): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const weeklyStatistics = user.weeklyStatistics || {};
+      weeklyStatistics[weekKey] = {
+        stats,
+        calculatedAt: new Date().toISOString()
+      };
+
+      await updateDoc(userRef, {
+        weeklyStatistics: weeklyStatistics,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error saving weekly statistics:', error);
+      throw error;
+    }
+  }
+
+  async saveMonthlyStatistics(userId: string, monthKey: string, stats: any): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const user = await this.getUser(userId);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const monthlyStatistics = user.monthlyStatistics || {};
+      monthlyStatistics[monthKey] = {
+        stats,
+        calculatedAt: new Date().toISOString()
+      };
+
+      await updateDoc(userRef, {
+        monthlyStatistics: monthlyStatistics,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error saving monthly statistics:', error);
       throw error;
     }
   }
