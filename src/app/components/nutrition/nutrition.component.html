@@ -1,7 +1,7 @@
-<div class="py-8  px-4   max-w-4xl mx-auto" (click)="closeCalendarOnClickOutside($event)">
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-2">
-        <h1 class="text-3xl font-bold" 
+<div class="py-4 sm:py-8 px-4 max-w-4xl lg:max-w-6xl mx-auto" (click)="closeCalendarOnClickOutside($event)">
+    <div class="mb-6 sm:mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold" 
          [ngClass]="{
           'text-gray-900': !darkModeService.darkMode(),
           'text-white' : darkModeService.darkMode()
@@ -9,9 +9,9 @@
           Nutrition Tracker
         </h1>
         
-        <div class="relative calendar-container">
+        <div class="relative calendar-container w-full sm:w-auto">
           <button (click)="calendarVisible = !calendarVisible; $event.stopPropagation()"
-            class="px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 hover:scale-105"
+            class="w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 hover:scale-105 justify-center sm:justify-start"
             [ngClass]="{
               'bg-black text-primary ': !darkModeService.darkMode(),
               'bg-blue-400 text-gray-900 ': darkModeService.darkMode()
@@ -21,13 +21,13 @@
           </button>
           
           <div *ngIf="calendarVisible" 
-            class="absolute right-0 mt-2 z-50 p-4 rounded-lg shadow-xl calendar-container"
+            class="absolute right-0 sm:right-0 lg:right-auto lg:left-1/2 lg:-translate-x-1/2 left-0 sm:left-auto mt-2 z-50 p-3 sm:p-4 lg:p-5 rounded-lg shadow-xl calendar-container"
             (click)="$event.stopPropagation()"
             [ngClass]="{
               'bg-white border border-gray-200': !darkModeService.darkMode(),
               'bg-gray-800 border border-gray-700': darkModeService.darkMode()
             }"
-            style="width: 300px;">
+            style="width: 100%; max-width: 300px; min-width: 280px;">
             <div class="flex justify-between items-center mb-4">
               <button (click)="previousMonth()" 
                 class="p-2 rounded hover:bg-gray-100"
@@ -200,19 +200,19 @@
     </div>
    
     <div *ngIf="user?.calorieTarget" 
-         class="mb-6 p-6 rounded-lg"
+         class="mb-6 p-4 sm:p-6 rounded-lg"
          [ngClass]="{
           'bg-blue-50 border-2 border-blue-200': !darkModeService.darkMode(),
           'bg-blue-900 border-2 border-blue-700': darkModeService.darkMode()
          }">
       
-      <div class="flex justify-between items-center mb-2">
-         <div class="text-lg font-semibold" [ngClass]="{
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+         <div class="text-base sm:text-lg font-semibold" [ngClass]="{
              'text-blue-900': !darkModeService.darkMode(),
              'text-blue-100': darkModeService.darkMode()
            }">Daily Calorie Progress</div>
          
-         <div class="text-2xl font-bold" 
+         <div class="text-xl sm:text-2xl font-bold" 
               [ngClass]="{
                 'text-blue-600': !darkModeService.darkMode(),
                 'text-blue-300': darkModeService.darkMode()
@@ -245,24 +245,24 @@
       </div>
     </div>
    
-    <div class="mb-6 p-6 rounded-lg"
+    <div class="mb-6 p-4 sm:p-6 rounded-lg"
          [ngClass]="{
            'bg-white shadow-lg': !darkModeService.darkMode(),
            'bg-gray-800': darkModeService.darkMode()
          }">
          
-         <h2 class="text-xl font-semibold mb-4"
+         <h2 class="text-lg sm:text-xl font-semibold mb-4"
            [ngClass]="{
              'text-gray-900': !darkModeService.darkMode(),
              'text-white': darkModeService.darkMode()
            }"> Search Food </h2>
          
-         <div class="flex gap-2 mb-4">
+         <div class="flex flex-col sm:flex-row gap-2 mb-4">
            <input type="text"
              [(ngModel)]="searchQuery"
              (keyup.enter)="searchFood()"
              placeholder="Search for food..."
-             class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+             class="flex-1 w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
              [ngClass]="{
                'border-gray-300 bg-white': !darkModeService.darkMode(),
                'border-gray-600 bg-gray-700 text-white': darkModeService.darkMode()
@@ -270,7 +270,7 @@
    
            <button (click)="searchFood()"
              [disabled]="isLoading || !searchQuery.trim()"
-             class="px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 hover:scale-105"
+             class="w-full sm:w-auto px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 hover:scale-105"
              [ngClass]="{
               'bg-black text-primary ': !darkModeService.darkMode(),
               'bg-blue-400 text-gray-900 ': darkModeService.darkMode()
@@ -315,8 +315,8 @@
                'text-blue-100': darkModeService.darkMode()
              }">Add {{ selectedFood.name }}</div>
    
-           <div class="flex gap-2 items-end">
-             <div class="flex-1">
+           <div class="flex flex-col sm:flex-row gap-2 sm:items-end">
+             <div class="flex-1 w-full">
                <label class="block text-sm mb-1"
                  [ngClass]="{
                    'text-gray-700': !darkModeService.darkMode(),
@@ -332,7 +332,7 @@
                  }" />
              </div>
    
-             <div class="text-sm font-semibold"
+             <div class="text-sm font-semibold text-center sm:text-left"
                [ngClass]="{
                  'text-blue-700': !darkModeService.darkMode(),
                  'text-blue-200': darkModeService.darkMode()
@@ -341,7 +341,7 @@
              </div>
    
              <button (click)="addFood()"
-               class="px-6 py-2 rounded-lg font-semibold transition-colors"
+               class="w-full sm:w-auto px-6 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
                [ngClass]="{
                  'bg-green-600 text-white hover:bg-green-700': !darkModeService.darkMode(),
                  'bg-green-500 text-white hover:bg-green-600': darkModeService.darkMode()
@@ -350,18 +350,18 @@
          </div>
      </div>
    
-     <div class="p-6 rounded-lg"
+     <div class="p-4 sm:p-6 rounded-lg"
           [ngClass]="{
             'bg-white shadow-lg': !darkModeService.darkMode(),
             'bg-gray-800': darkModeService.darkMode()
           }">
-         <h2 class="text-xl font-semibold mb-4"
+         <h2 class="text-lg sm:text-xl font-semibold mb-4"
            [ngClass]="{
              'text-gray-900': !darkModeService.darkMode(),
              'text-white': darkModeService.darkMode()
            }">
            {{ selectedDate === today ? "Today's" : "Selected Date's" }} Food Entries
-           <span class="text-sm font-normal ml-2"
+           <span class="text-xs sm:text-sm font-normal ml-2"
              [ngClass]="{
                'text-gray-600': !darkModeService.darkMode(),
                'text-gray-400': darkModeService.darkMode()
@@ -381,18 +381,18 @@
    
          <div *ngIf="todayEntries.length > 0" class="space-y-3">
            <div *ngFor="let entry of todayEntries"
-             class="p-4 border rounded-lg flex justify-between items-center"
+             class="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
              [ngClass]="{
                'border-gray-200 bg-gray-50': !darkModeService.darkMode(),
                'border-gray-600 bg-gray-700': darkModeService.darkMode()
              }">
-               <div class="flex-1">
-                 <div class="font-semibold"
+               <div class="flex-1 min-w-0">
+                 <div class="font-semibold text-base sm:text-lg"
                    [ngClass]="{
                      'text-gray-900': !darkModeService.darkMode(),
                      'text-white': darkModeService.darkMode()
                    }">{{ entry.name }}</div>
-                 <div class="text-sm mt-1"
+                 <div class="text-xs sm:text-sm mt-1"
                    [ngClass]="{
                      'text-gray-600': !darkModeService.darkMode(),
                      'text-gray-300': darkModeService.darkMode()
@@ -402,10 +402,10 @@
                </div>
    
                <button (click)="removeFoodEntry(entry.id)"
-                 class="ml-4 px-4 py-2 rounded-lg font-semibold transition-colors hover:scale-105 "
+                 class="w-full sm:w-auto sm:ml-4 px-4 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
                  [ngClass]="{
                    'bg-red-200 text-red-700 hover:bg-red-300': !darkModeService.darkMode(),
-                   'bg-red-900 text-bg-gray-300': darkModeService.darkMode()
+                   'bg-red-900 text-red-200 hover:bg-red-800': darkModeService.darkMode()
                  }">Remove</button>
            </div>
          </div>
