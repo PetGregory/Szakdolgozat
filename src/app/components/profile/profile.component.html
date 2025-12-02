@@ -73,7 +73,7 @@
       </div>
     </div>
   
-    <div *ngIf="!isAdmin" class="text-3xl font-bold mb-3 ml-1 text-left w-full tracking-tight" [ngClass]="{ 'text-black': !darkModeService.darkMode(), 'text-white': darkModeService.darkMode() }">Your Workout Plan</div>
+    <div *ngIf="!isAdmin" class="text-3xl font-bold mb-3 ml-1 text-left w-full tracking-tight" [ngClass]="{ 'text-blue-700': !darkModeService.darkMode(), 'text-blue-300': darkModeService.darkMode() }">Your Workout Plan</div>
   
     <div *ngIf="!isAdmin" class="rounded-xl shadow-lg p-8 flex flex-col items-center min-h-[160px] w-full mb-4"
      [ngClass]="{ 'bg-white': !darkModeService.darkMode(), 'bg-gray-800': darkModeService.darkMode() }">

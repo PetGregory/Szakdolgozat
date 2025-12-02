@@ -394,7 +394,6 @@ export class StatisticsService {
     const monthDates = this.getMonthDates(year, month);
     const dailyTarget = workoutPlan.calorieTarget;
     
-    // Get all weeks in the month
     const weeks: WeeklyCalorieStat[] = [];
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
@@ -450,7 +449,7 @@ export class StatisticsService {
   }
 
   getCurrentWeekOffset(): number {
-    return 0; // Current week
+    return 0;
   }
 }
 
