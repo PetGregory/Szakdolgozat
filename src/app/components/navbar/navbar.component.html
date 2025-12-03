@@ -54,7 +54,7 @@
           'text-gray-500 hover:text-black': !darkModeService.darkMode(),
           'text-primary hover:text-accent1': darkModeService.darkMode()
         }"
-        >Workouts</button>
+        >Workout Plan</button>
       <button
         *ngIf="isLoggedIn && !isAdmin"
         (click)="goToNutrition()"
@@ -203,7 +203,7 @@
     }"
   >
     <div class="flex justify-between items-center w-full text-2xl py-3">
-      <p>Workouts</p>
+      <p>Workout Plan</p>
       <span>></span>
     </div>
   </button>
@@ -237,6 +237,17 @@
     }">
     <div class="flex justify-between items-center w-full text-2xl py-3">
       <p>Forum</p>
+      <span>></span>
+    </div>
+  </button>
+
+  <button *ngIf="isLoggedIn && !isAdmin" (click)="goToStats(); closeMenu()" style="width: 90%; margin: 0 auto;"
+    [ngClass]="{
+      'hover:text-accent1': darkModeService.darkMode(),
+      'hover:text-black': !darkModeService.darkMode
+    }">
+    <div class="flex justify-between items-center w-full text-2xl py-3">
+      <p>Statistics</p>
       <span>></span>
     </div>
   </button>

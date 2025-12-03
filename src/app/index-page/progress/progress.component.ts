@@ -1,9 +1,5 @@
-
-
 import { Component } from '@angular/core';
-
 import { DarkModeService } from '../../components/dark-mode-service';
-
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,9 +8,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.css'
 })
-
 export class ProgressComponent {
-
   constructor(public darkModeService: DarkModeService) {}
-
+  
 }
