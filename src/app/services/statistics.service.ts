@@ -95,6 +95,25 @@ export class StatisticsService {
     });
   }
 
+  private exerciseNameMatchesBodyPart(exerciseName: string, bodyPart: string): boolean {
+    const patterns: { [key: string]: string[] } = {
+      'chest': ['chest', 'pec', 'push-up', 'bench', 'fly'],
+      'back': ['back', 'pull', 'row', 'lat', 'deadlift'],
+      'shoulders': ['shoulder', 'deltoid', 'press', 'raise', 'lateral'],
+      'upper arms': ['bicep', 'tricep', 'curl', 'extension', 'arm'],
+      'lower arms': ['forearm', 'wrist', 'grip'],
+      'upper legs': ['quad', 'thigh', 'leg', 'squat', 'lunge', 'hamstring'],
+      'lower legs': ['calf', 'ankle', 'shin'],
+      'waist': ['core', 'ab', 'crunch', 'plank', 'sit-up'],
+      'cardio': ['run', 'jog', 'sprint', 'cardio', 'aerobic']
+    };
+
+    const bodyPartKey = bodyPart.toLowerCase();
+    const matchingPatterns = patterns[bodyPartKey] || [];
+    
+    return matchingPatterns.some(pattern => exerciseName.includes(pattern));
+  }
+
   getCategoryExercises(category: string, stats: CategoryStat[]): string[] {
     const stat = stats.find(s => s.category === category);
     return stat?.exercises || [];
@@ -191,7 +210,18 @@ export class StatisticsService {
       const bodyParts = this.bodyPartMapping[category] || [];
       
       const matchingExercises = loggedWorkouts.filter(workout => {
-        if (!workout.bodyPart) return false;
+        if (!workout.bodyPart) {
+          const exerciseNameLower = workout.exerciseName?.toLowerCase() || '';
+          
+          for (const bodyPart of bodyParts) {
+            const bodyPartLower = bodyPart.toLowerCase();
+            if (exerciseNameLower.includes(bodyPartLower) || 
+                this.exerciseNameMatchesBodyPart(exerciseNameLower, bodyPartLower)) {
+              return true;
+            }
+          }
+          return false;
+        }
         return this.matchesBodyPart(workout.bodyPart, bodyParts);
       });
 

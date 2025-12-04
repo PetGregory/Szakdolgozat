@@ -94,8 +94,13 @@ export class StatisticsComponent implements OnInit, OnDestroy {
       this.weekEndDate = this.formatDate(weekDates.end);
 
       const savedStats = this.userData.weeklyStatistics?.[weekKey];
+      const statsCalculatedAt = savedStats?.calculatedAt ? new Date(savedStats.calculatedAt) : null;
+      const userUpdatedAt = this.userData.updatedAt ? new Date(this.userData.updatedAt) : null;
       
-      if (savedStats && savedStats.stats) {
+      const shouldUseCache = savedStats && savedStats.stats && 
+        statsCalculatedAt && userUpdatedAt && statsCalculatedAt >= userUpdatedAt;
+      
+      if (shouldUseCache) {
         this.weeklyStats = savedStats.stats;
       } else {
         const workoutPlan = this.userData.workout as WorkoutPlan | null;
@@ -129,8 +134,13 @@ export class StatisticsComponent implements OnInit, OnDestroy {
       this.monthName = new Date(this.currentYear, this.currentMonth - 1, 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
       const savedStats = this.userData.monthlyStatistics?.[monthKey];
+      const statsCalculatedAt = savedStats?.calculatedAt ? new Date(savedStats.calculatedAt) : null;
+      const userUpdatedAt = this.userData.updatedAt ? new Date(this.userData.updatedAt) : null;
       
-      if (savedStats && savedStats.stats) {
+      const shouldUseCache = savedStats && savedStats.stats && 
+        statsCalculatedAt && userUpdatedAt && statsCalculatedAt >= userUpdatedAt;
+      
+      if (shouldUseCache) {
         this.monthlyStats = savedStats.stats;
       } else {
         this.monthlyStats = this.statisticsService.calculateMonthlyStats(this.userData, this.currentYear, this.currentMonth);

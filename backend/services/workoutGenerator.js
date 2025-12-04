@@ -98,7 +98,7 @@ async function generateWorkoutPlan(userData) {
     }
     return false;
   }
-
+  
   for (let i = 0; i < template.length && selectedDays.length < 7; i++) {
     const dayType = template[i];
     
@@ -161,12 +161,12 @@ async function generateWorkoutPlan(userData) {
           daysSinceLastRest = 0;
         }
       } else {
-        selectedDays.push('rest day');
+    selectedDays.push('rest day');
         daysSinceLastRest = 0;
       }
     }
   }
-  
+
   const actualRestDays = selectedDays.filter(d => d === 'rest day' || d === 'rest').length;
   const actualTotalDays = 7;
 

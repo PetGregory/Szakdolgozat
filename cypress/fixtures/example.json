@@ -1,0 +1,17 @@
+{
+  "testUser": {
+    "email": "test@example.com",
+    "password": "testpassword123",
+    "username": "testuser"
+  },
+  "workoutData": {
+    "gender": "male",
+    "age": 25,
+    "weight": 75,
+    "height": 180,
+    "goal": "muscle_gain",
+    "fitnessLevel": "beginner",
+    "availableDays": 5
+  }
+}
+

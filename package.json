@@ -8,6 +8,11 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:headless": "cypress run --headless",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open",
     "deploy": "npm run build:prod && firebase deploy",
     "deploy:hosting": "npm run build:prod && firebase deploy --only hosting"
   },
@@ -42,6 +47,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.1.6",
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.2",
+    "cypress": "^13.7.0"
   }
 }
