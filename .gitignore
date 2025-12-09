@@ -10,6 +10,11 @@
 backend/node_modules
 **/node_modules
 
+# Dependency files
+package-lock.json
+backend/package-lock.json
+**/package-lock.json
+
 # IDEs and editors
 .idea/
 .project
