@@ -29,4 +29,21 @@ npm start
 
 Az alkalmazás elérhető lesz a `http://localhost:4200` címen.
 
+### 4. Production build készítése
 
+```bash
+npm run build:prod
+```
+
+## Deployment
+
+### Firebase-re való deploy
+
+```bash
+npm run deploy:hosting
+```
+
+## További Információk
+
+- **Firebase Project**: bestrong-74932
+- **Angular verzió**: 19.2.15
