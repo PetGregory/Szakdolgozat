@@ -1,0 +1,44 @@
+<div id="container">
+  <img id="image"
+    src="work.jpg"
+    alt="Plan your workout"
+    class="rounded-2xl cursor-pointer"
+    style="width: 100vw"
+    (click)="goToWorkouts()"
+  />
+ 
+
+  <div id="rightDiv" class="items-center">
+    <div class="mb-5">
+        <h2
+      class="font-bold"
+      [ngClass]="{
+        'text-primary': darkModeService.darkMode()
+      }"
+    >
+      Personalized Workout Plans
+    </h2>
+
+    <p
+      class=""
+      [ngClass]="{
+        'text-primary': darkModeService.darkMode()
+      }"
+    >
+      Set your goals and enter your data <br /> we'll generate the ideal
+      workout plan for you.<br />
+      Follow your plan and see results.
+    </p>
+    </div>
+    <button
+  (click)="goToWorkouts()"
+  class="inline-block  text-2xl  px-7 py-3 rounded-full font-semibold transform transition-transform duration-200 hover:scale-105"
+  [ngClass]="{
+    'text-white bg-black': !darkModeService.darkMode(),
+    'text-primary bg-accent1': darkModeService.darkMode()
+  }"
+>
+  Check your workout
+</button>
+  </div>
+</div>

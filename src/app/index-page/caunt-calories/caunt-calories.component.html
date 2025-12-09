@@ -1,0 +1,44 @@
+<div id="container">
+    <img id="image"
+      src="nutrion_plan.jpg"
+      alt="Count the calories you eat"
+      class="rounded-2xl cursor-pointer"
+      style="width: 100vw"
+      (click)="goToNutrition()"
+    />
+   
+  
+    <div id="rightDiv" class="items-center">
+      <div class="mb-5">
+          <h2
+        class="font-bold"
+        [ngClass]="{
+          'text-primary': darkModeService.darkMode()
+        }"
+      >
+        Caunt the calories you eat
+      </h2>
+  
+      <p
+        class=""
+        [ngClass]="{
+          'text-primary': darkModeService.darkMode()
+        }"
+      >
+        Track your daily calorie intake and maintain a balanced diet. <br />Enter your meals and we'll help you <br />
+        reach your nutrition goals.
+      </p>
+      </div>
+      <button
+    (click)="goToNutrition()"
+    class="inline-block  text-2xl  px-7 py-3 rounded-full font-semibold transform transition-transform duration-200 hover:scale-105"
+    [ngClass]="{
+      'text-white bg-black': !darkModeService.darkMode(),
+      'text-primary bg-accent1': darkModeService.darkMode()
+    }"
+  >
+    Count Calories
+  </button>
+    </div>
+  </div>
+  

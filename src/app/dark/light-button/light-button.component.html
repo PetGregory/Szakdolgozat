@@ -1,0 +1,6 @@
+ <div class=" text-2xl mr-10  text-right" style="margin-top: 6rem;">
+    <button (click)="toggleDarkMode()" class="text-right">
+  <span *ngIf="darkModeService.darkMode(); else darkIcon2">☀️</span>
+  <ng-template #darkIcon2>🌙</ng-template>
+</button>
+ </div>

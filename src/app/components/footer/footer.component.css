@@ -1,0 +1,47 @@
+footer {
+  transition: all 0.3s ease;
+  margin-top: 10rem;
+}
+
+footer a,
+footer button,
+footer input {
+  transition: all 0.2s ease-in-out;
+}
+
+footer .social-icons a:hover {
+  transform: translateY(-2px);
+}
+
+footer input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+footer button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+  
+  footer .grid {
+    gap: 2rem;
+  }
+}
+
+.dark footer {
+  background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+}
+
+
+
+footer h3 {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+footer .border-t {
+  border-image: linear-gradient(90deg, transparent, #e5e7eb, transparent) 1;
+}
