@@ -343,9 +343,9 @@
              <button (click)="addFood()"
                class="w-full sm:w-auto px-6 py-2 rounded-lg font-semibold transition-colors hover:scale-105"
                [ngClass]="{
-                 'bg-green-600 text-white hover:bg-green-700': !darkModeService.darkMode(),
-                 'bg-green-500 text-white hover:bg-green-600': darkModeService.darkMode()
-               }">Add</button>
+                                'bg-black text-primary ': !darkModeService.darkMode(),
+                                'bg-blue-400 text-gray-900 ': darkModeService.darkMode()
+                              }">Add</button>
            </div>
          </div>
      </div>

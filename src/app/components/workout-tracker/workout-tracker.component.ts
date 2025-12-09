@@ -460,18 +460,5 @@ export class WorkoutTrackerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageError(event: Event) {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-      target.src = 'https://via.placeholder.com/400?text=Image+Not+Available';
-    }
-  }
-
-  onImageErrorSmall(event: Event) {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-      target.src = 'https://via.placeholder.com/96?text=No+Image';
-    }
-  }
 }
 
